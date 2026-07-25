@@ -7,10 +7,12 @@ class AppTextTheme {
   static TextTheme get textTheme {
     return const TextTheme(
       titleLarge: AppTypography.titleRegular,
-      titleMedium: AppTypography.titleSmall,
+      titleMedium: AppTypography.titleMedium,
+      titleSmall: AppTypography.titleSmall,
       labelSmall: AppTypography.titleTiny,
       labelLarge: AppTypography.button,
       labelMedium: AppTypography.buttonSmall,
+      bodyLarge: AppTypography.caption,
       bodyMedium: AppTypography.paragraphMedium,
       bodySmall: AppTypography.paragraphSmall,
     );
