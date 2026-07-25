@@ -9,7 +9,7 @@ class AppTopBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       height: 56,
-      child: Text(title, style: Theme.of(context).textTheme.titleMedium),
+      child: Text(title, style: Theme.of(context).textTheme.titleSmall),
     );
   }
 }

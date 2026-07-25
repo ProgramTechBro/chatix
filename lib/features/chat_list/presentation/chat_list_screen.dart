@@ -9,7 +9,7 @@ class ChatListScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.white,
       body: Center(
-        child: Text('Home', style: Theme.of(context).textTheme.titleLarge),
+        child: Text('Chats', style: Theme.of(context).textTheme.titleLarge),
       ),
     );
   }

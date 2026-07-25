@@ -16,6 +16,14 @@ class AppTypography {
     color: AppColors.black,
   );
 
+  static const TextStyle titleMedium = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 22,
+    fontWeight: FontWeight.w600,
+    height: 1.0,
+    color: AppColors.black,
+  );
+
   static const TextStyle titleSmall = TextStyle(
     fontFamily: fontFamily,
     fontSize: 20,
@@ -30,6 +38,14 @@ class AppTypography {
     fontWeight: FontWeight.w500,
     height: 1.0,
     color: AppColors.black,
+  );
+
+  static const TextStyle caption = TextStyle(
+    fontFamily: fontFamilySecondary,
+    fontSize: 10,
+    fontWeight: FontWeight.w400,
+    height: 1.0,
+    color: AppColors.textSecondary,
   );
 
   static const TextStyle button = TextStyle(

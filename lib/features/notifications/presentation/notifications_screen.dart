@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import '../../../config/app_colors.dart';
 
-class SettingsScreen extends StatelessWidget {
-  const SettingsScreen({super.key});
+class NotificationsScreen extends StatelessWidget {
+  const NotificationsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.white,
       body: Center(
-        child: Text('Settings', style: Theme.of(context).textTheme.titleLarge),
+        child: Text('Notifications', style: Theme.of(context).textTheme.titleLarge),
       ),
     );
   }
