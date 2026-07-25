@@ -29,7 +29,7 @@ class AppTypography {
     fontSize: 10,
     fontWeight: FontWeight.w500,
     height: 1.0,
-    color: AppColors.textSecondary,
+    color: AppColors.black,
   );
 
   static const TextStyle button = TextStyle(
@@ -46,6 +46,14 @@ class AppTypography {
     fontWeight: FontWeight.w500,
     height: 1.0,
     color: AppColors.white,
+  );
+
+  static const TextStyle paragraphMedium = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 15,
+    fontWeight: FontWeight.w400,
+    height: 1.0,
+    color: AppColors.black,
   );
 
   static const TextStyle paragraphSmall = TextStyle(
