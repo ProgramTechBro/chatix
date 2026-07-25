@@ -11,6 +11,7 @@ class AppTextTheme {
       labelSmall: AppTypography.titleTiny,
       labelLarge: AppTypography.button,
       labelMedium: AppTypography.buttonSmall,
+      bodyMedium: AppTypography.paragraphMedium,
       bodySmall: AppTypography.paragraphSmall,
     );
   }

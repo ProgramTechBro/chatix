@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../routes/app_pages.dart';
 import 'theme/app_theme.dart';
 
 class ChatixApp extends StatelessWidget {
@@ -6,24 +7,11 @@ class ChatixApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
       title: 'Chatix',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
-      home: const _AppRoot(),
-    );
-  }
-}
-
-class _AppRoot extends StatelessWidget {
-  const _AppRoot();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(
-        child: Text('Chatix'),
-      ),
+      routerConfig: appRouter,
     );
   }
 }

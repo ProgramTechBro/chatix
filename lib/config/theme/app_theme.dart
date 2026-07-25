@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../app_colors.dart';
+import '../app_typography.dart';
 import 'app_text_theme.dart';
 
 class AppTheme {
@@ -27,15 +28,29 @@ class AppTheme {
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primary,
           foregroundColor: AppColors.white,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          disabledBackgroundColor: AppColors.primary.withValues(alpha: 0.4),
+          elevation: 0,
+          shape: const StadiumBorder(),
         ),
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: AppColors.surface,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+        prefixIconColor: AppColors.textSecondary,
+        suffixIconColor: AppColors.textSecondary,
+        hintStyle: AppTypography.button.copyWith(color: AppColors.textSecondary),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(100),
           borderSide: BorderSide.none,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(100),
+          borderSide: BorderSide.none,
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(100),
+          borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
         ),
       ),
     );
