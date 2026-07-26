@@ -2,12 +2,26 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../../../../config/app_assets.dart';
 import '../../../../config/app_colors.dart';
+import '../../../../core/utils/helpers/formatters.dart';
 import '../../domain/entities/post_entity.dart';
 
 class PostCard extends StatelessWidget {
-  const PostCard({super.key, required this.post});
+  const PostCard({
+    super.key,
+    required this.post,
+    this.onLikeTap,
+    this.onCommentTap,
+    this.onSendTap,
+    this.onShareTap,
+    this.onMoreTap,
+  });
 
   final PostEntity post;
+  final VoidCallback? onLikeTap;
+  final VoidCallback? onCommentTap;
+  final VoidCallback? onSendTap;
+  final VoidCallback? onShareTap;
+  final ValueChanged<Offset>? onMoreTap;
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +53,10 @@ class PostCard extends StatelessWidget {
                       const SizedBox(width: 4),
                       Text('· ${post.postedAgo}', style: textTheme.bodyMedium?.copyWith(color: AppColors.textSecondary)),
                       const Spacer(),
-                      SvgPicture.asset(AppIcons.postMore, width: 24, height: 24),
+                      GestureDetector(
+                        onTapDown: (details) => onMoreTap?.call(details.globalPosition),
+                        child: SvgPicture.asset(AppIcons.postMore, width: 24, height: 24),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 8),
@@ -71,19 +88,27 @@ class PostCard extends StatelessWidget {
                 children: [
                   _PostAction(
                     icon: AppIcons.postLike,
-                    label: _formatCount(post.likeCount),
+                    label: formatCompactCount(post.likeCount),
                     color: post.isLiked ? AppColors.primary : AppColors.textSecondary,
+                    onTap: onLikeTap,
                   ),
                   _PostAction(
                     icon: AppIcons.postComment,
-                    label: _formatCount(post.commentCount),
+                    label: formatCompactCount(post.commentCount),
                     color: AppColors.textSecondary,
+                    onTap: onCommentTap,
                   ),
-                  _PostAction(icon: AppIcons.postSend, label: 'Send', color: AppColors.textSecondary),
+                  _PostAction(
+                    icon: AppIcons.postSend,
+                    label: 'Send',
+                    color: AppColors.textSecondary,
+                    onTap: onSendTap,
+                  ),
                   _PostAction(
                     icon: AppIcons.postShare,
-                    label: _formatCount(post.shareCount),
+                    label: formatCompactCount(post.shareCount),
                     color: AppColors.textSecondary,
+                    onTap: onShareTap,
                   ),
                 ],
               ),
@@ -93,34 +118,28 @@ class PostCard extends StatelessWidget {
       ),
     );
   }
-
-  static String _formatCount(int count) {
-    if (count >= 1000000) {
-      return '${(count / 1000000).toStringAsFixed(count % 1000000 == 0 ? 0 : 1)}M';
-    }
-    if (count >= 1000) {
-      return '${(count / 1000).toStringAsFixed(count % 1000 == 0 ? 0 : 1)}k';
-    }
-    return '$count';
-  }
 }
 
 class _PostAction extends StatelessWidget {
-  const _PostAction({required this.icon, required this.label, required this.color});
+  const _PostAction({required this.icon, required this.label, required this.color, this.onTap});
 
   final String icon;
   final String label;
   final Color color;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        SvgPicture.asset(icon, width: 24, height: 24, colorFilter: ColorFilter.mode(color, BlendMode.srcIn)),
-        const SizedBox(width: 4),
-        Text(label, style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: color)),
-      ],
+    return GestureDetector(
+      onTap: onTap,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SvgPicture.asset(icon, width: 24, height: 24, colorFilter: ColorFilter.mode(color, BlendMode.srcIn)),
+          const SizedBox(width: 4),
+          Text(label, style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: color)),
+        ],
+      ),
     );
   }
 }
