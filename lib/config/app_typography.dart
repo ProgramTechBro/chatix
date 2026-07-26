@@ -40,6 +40,14 @@ class AppTypography {
     color: AppColors.black,
   );
 
+  static const TextStyle nameSemiBold = TextStyle(
+    fontFamily: fontFamilySecondary,
+    fontSize: 15,
+    fontWeight: FontWeight.w600,
+    height: 22 / 15,
+    color: AppColors.black,
+  );
+
   static const TextStyle caption = TextStyle(
     fontFamily: fontFamilySecondary,
     fontSize: 10,

@@ -5,6 +5,9 @@ import '../../../config/app_colors.dart';
 import '../../../routes/app_routes.dart';
 import 'local_widgets/home_top_bar.dart';
 import 'local_widgets/post_card.dart';
+import 'local_widgets/post_options_menu.dart';
+import 'local_widgets/send_to_sheet.dart';
+import 'local_widgets/share_sheet.dart';
 import 'providers/feed_provider.dart';
 
 class HomeScreen extends ConsumerWidget {
@@ -12,7 +15,7 @@ class HomeScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final feedAsync = ref.watch(feedPostsProvider);
+    final feedAsync = ref.watch(feedControllerProvider);
     final textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
@@ -40,7 +43,17 @@ class HomeScreen extends ConsumerWidget {
                 data: (posts) => ListView.builder(
                   padding: const EdgeInsets.only(top: 16),
                   itemCount: posts.length,
-                  itemBuilder: (context, index) => PostCard(post: posts[index]),
+                  itemBuilder: (context, index) {
+                    final post = posts[index];
+                    return PostCard(
+                      post: post,
+                      onLikeTap: () => ref.read(feedControllerProvider.notifier).toggleLike(post.id),
+                      onCommentTap: () => context.push(AppRoutes.postDetailPath(post.id)),
+                      onSendTap: () => showSendToSheet(context),
+                      onShareTap: () => showShareSheet(context),
+                      onMoreTap: (position) => showPostOptionsMenu(context, position),
+                    );
+                  },
                 ),
                 loading: () => const Center(
                   child: CircularProgressIndicator(color: AppColors.primary),

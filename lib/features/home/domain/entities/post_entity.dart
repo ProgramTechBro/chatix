@@ -24,4 +24,20 @@ class PostEntity {
   final int commentCount;
   final int shareCount;
   final bool isLiked;
+
+  PostEntity copyWith({int? likeCount, bool? isLiked}) {
+    return PostEntity(
+      id: id,
+      authorName: authorName,
+      authorAvatarUrl: authorAvatarUrl,
+      isVerified: isVerified,
+      postedAgo: postedAgo,
+      caption: caption,
+      imageAsset: imageAsset,
+      likeCount: likeCount ?? this.likeCount,
+      commentCount: commentCount,
+      shareCount: shareCount,
+      isLiked: isLiked ?? this.isLiked,
+    );
+  }
 }

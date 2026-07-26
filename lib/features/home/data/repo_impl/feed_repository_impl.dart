@@ -16,4 +16,10 @@ class FeedRepositoryImpl implements FeedRepository {
     final posts = await _localDataSource.getFeedPosts();
     return Right(posts);
   }
+
+  @override
+  Future<Either<Failure, PostEntity>> toggleLikePost(String postId) async {
+    final post = await _localDataSource.toggleLike(postId);
+    return Right(post);
+  }
 }

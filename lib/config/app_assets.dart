@@ -34,6 +34,9 @@ class AppIcons {
   static const String postComment = '${_base}comment.svg';
   static const String postSend = '${_base}send.svg';
   static const String postShare = '${_base}share.svg';
+
+  static const String shareWhatsapp = '${_base}whatsapp.svg';
+  static const String shareFacebook = '${_base}facebook.svg';
 }
 
 class AppNetworkImages {
@@ -42,4 +45,11 @@ class AppNetworkImages {
   static const String currentUserAvatar = 'https://i.pravatar.cc/150?img=12';
   static const String postAuthorMikeTyson = 'https://i.pravatar.cc/150?img=13';
   static const String postAuthorBitcoin = 'https://i.pravatar.cc/150?img=33';
+  static const String postAuthorRobertJohn = 'https://i.pravatar.cc/150?img=14';
+
+  static const String contactJonathan = 'https://i.pravatar.cc/150?img=15';
+  static const String contactGebrel = 'https://i.pravatar.cc/150?img=25';
+  static const String contactSultan = 'https://i.pravatar.cc/150?img=52';
+  static const String contactJoshim = 'https://i.pravatar.cc/150?img=53';
+  static const String contactAlbert = 'https://i.pravatar.cc/150?img=60';
 }

@@ -13,6 +13,7 @@ class AppTextTheme {
       labelLarge: AppTypography.button,
       labelMedium: AppTypography.buttonSmall,
       bodyLarge: AppTypography.caption,
+      headlineSmall: AppTypography.nameSemiBold,
       bodyMedium: AppTypography.paragraphMedium,
       bodySmall: AppTypography.paragraphSmall,
     );
