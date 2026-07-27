@@ -14,6 +14,6 @@ class ShareContactsRepositoryImpl implements ShareContactsRepository {
   @override
   Future<Either<Failure, List<ShareContactEntity>>> getContacts() async {
     final contacts = await _localDataSource.getContacts();
-    return Right(contacts);
+    return Right(List<ShareContactEntity>.of(contacts));
   }
 }

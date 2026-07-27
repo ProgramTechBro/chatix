@@ -137,7 +137,7 @@ class _SendToIconButton extends StatelessWidget {
         decoration: const BoxDecoration(color: AppColors.surface, shape: BoxShape.circle),
         child: Center(
           child: icon != null
-              ? SvgPicture.asset(icon!, width: 24, height: 24)
+              ? SvgPicture.asset(icon!, width: 24, height: 24,color:AppColors.black)
               : Icon(materialIcon, size: 24, color: AppColors.black),
         ),
       ),

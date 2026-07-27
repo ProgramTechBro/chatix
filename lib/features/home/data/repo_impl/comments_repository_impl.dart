@@ -14,6 +14,6 @@ class CommentsRepositoryImpl implements CommentsRepository {
   @override
   Future<Either<Failure, List<CommentEntity>>> getComments(String postId) async {
     final comments = await _localDataSource.getComments(postId);
-    return Right(comments);
+    return Right(List<CommentEntity>.of(comments));
   }
 }
