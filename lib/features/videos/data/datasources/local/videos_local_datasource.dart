@@ -8,14 +8,12 @@ abstract class VideosLocalDataSource {
 
 @LazySingleton(as: VideosLocalDataSource)
 class VideosLocalDataSourceImpl implements VideosLocalDataSource {
-  static const _base = 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample';
-
   @override
   Future<List<VideoModel>> getVideos() async {
     return const [
       VideoModel(
         id: 'v1',
-        videoUrl: '$_base/BigBuckBunny.mp4',
+        videoUrl: 'https://flutter.github.io/assets-for-api-docs/assets/videos/bee.mp4',
         thumbnailAsset: AppImages.videoThumb1,
         authorName: 'Johana West',
         caption: 'Behind the scenes with the crew',
@@ -23,7 +21,7 @@ class VideosLocalDataSourceImpl implements VideosLocalDataSource {
       ),
       VideoModel(
         id: 'v2',
-        videoUrl: '$_base/ForBiggerBlazes.mp4',
+        videoUrl: 'https://flutter.github.io/assets-for-api-docs/assets/videos/butterfly.mp4',
         thumbnailAsset: AppImages.videoThumb2,
         authorName: 'Johana West',
         caption: 'Chasing sunsets on set',
@@ -31,7 +29,7 @@ class VideosLocalDataSourceImpl implements VideosLocalDataSource {
       ),
       VideoModel(
         id: 'v3',
-        videoUrl: '$_base/ForBiggerEscapes.mp4',
+        videoUrl: 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
         thumbnailAsset: AppImages.videoThumb3,
         authorName: 'Johana West',
         caption: 'Golden hour shoot day',
@@ -39,7 +37,7 @@ class VideosLocalDataSourceImpl implements VideosLocalDataSource {
       ),
       VideoModel(
         id: 'v4',
-        videoUrl: '$_base/ForBiggerFun.mp4',
+        videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
         thumbnailAsset: AppImages.videoThumb4,
         authorName: 'Johana West',
         caption: 'Late night editing sessions',
@@ -47,7 +45,7 @@ class VideosLocalDataSourceImpl implements VideosLocalDataSource {
       ),
       VideoModel(
         id: 'v5',
-        videoUrl: '$_base/Sintel.mp4',
+        videoUrl: 'https://media.w3.org/2010/05/sintel/trailer.mp4',
         thumbnailAsset: AppImages.videoThumb5,
         authorName: 'Johana West',
         caption: 'New gear day!',
@@ -55,7 +53,7 @@ class VideosLocalDataSourceImpl implements VideosLocalDataSource {
       ),
       VideoModel(
         id: 'v6',
-        videoUrl: '$_base/ElephantsDream.mp4',
+        videoUrl: 'https://media.w3.org/2010/05/bunny/movie.mp4',
         thumbnailAsset: AppImages.videoThumb6,
         authorName: 'Johana West',
         caption: 'Stage lighting rehearsal',

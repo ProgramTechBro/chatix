@@ -22,8 +22,14 @@ class ProfileScreen extends ConsumerStatefulWidget {
   ConsumerState<ProfileScreen> createState() => _ProfileScreenState();
 }
 
-class _ProfileScreenState extends ConsumerState<ProfileScreen> {
-  int _activeTab = 0;
+class _ProfileScreenState extends ConsumerState<ProfileScreen> with SingleTickerProviderStateMixin {
+  late final TabController _tabController = TabController(length: 3, vsync: this);
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,23 +41,73 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       body: Stack(
         children: [
           profileAsync.when(
-            data: (profile) => CustomScrollView(
-              slivers: [
+            data: (profile) => NestedScrollView(
+              headerSliverBuilder: (context, innerBoxIsScrolled) => [
                 SliverToBoxAdapter(
                   child: ProfileHeader(profile: profile, onEditProfile: () {}, onShareProfile: () {}),
                 ),
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: ProfileTabBar(
-                      activeIndex: _activeTab,
-                      onChanged: (index) => setState(() => _activeTab = index),
-                    ),
+                SliverOverlapAbsorber(
+                  handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
+                  sliver: SliverPersistentHeader(
+                    pinned: true,
+                    delegate: _StickyTabBarDelegate(tabController: _tabController),
                   ),
                 ),
-                SliverToBoxAdapter(child: _buildTabContent(widget.userId)),
-                const SliverToBoxAdapter(child: SizedBox(height: 24)),
               ],
+              body: TabBarView(
+                controller: _tabController,
+                children: [
+                  Consumer(
+                    builder: (context, ref, _) {
+                      final postsAsync = ref.watch(profilePostsProvider(widget.userId));
+                      return postsAsync.when(
+                        data: (posts) => _ProfileTabBody(
+                          storageKey: 'posts',
+                          child: Column(
+                            children: [
+                              for (final post in posts)
+                                PostCard(
+                                  post: post,
+                                  onSendTap: () => showSendToSheet(context),
+                                  onShareTap: () => showShareSheet(context),
+                                  onMoreTap: (position) => showPostOptionsMenu(context, post.id, position),
+                                ),
+                            ],
+                          ),
+                        ),
+                        loading: () => const Center(child: CircularProgressIndicator(color: AppColors.primary)),
+                        error: (error, stackTrace) => const SizedBox.shrink(),
+                      );
+                    },
+                  ),
+                  Consumer(
+                    builder: (context, ref, _) {
+                      final photosAsync = ref.watch(profilePhotosProvider(widget.userId));
+                      return photosAsync.when(
+                        data: (photos) => _ProfileTabBody(
+                          storageKey: 'photos',
+                          child: ProfilePhotoGrid(photoAssets: photos),
+                        ),
+                        loading: () => const Center(child: CircularProgressIndicator(color: AppColors.primary)),
+                        error: (error, stackTrace) => const SizedBox.shrink(),
+                      );
+                    },
+                  ),
+                  Consumer(
+                    builder: (context, ref, _) {
+                      final videosAsync = ref.watch(videosProvider);
+                      return videosAsync.when(
+                        data: (videos) => _ProfileTabBody(
+                          storageKey: 'videos',
+                          child: ProfileVideoGrid(videos: videos),
+                        ),
+                        loading: () => const Center(child: CircularProgressIndicator(color: AppColors.primary)),
+                        error: (error, stackTrace) => const SizedBox.shrink(),
+                      );
+                    },
+                  ),
+                ],
+              ),
             ),
             loading: () => const Center(child: CircularProgressIndicator(color: AppColors.primary)),
             error: (error, stackTrace) => Center(
@@ -67,61 +123,61 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       ),
     );
   }
+}
 
-  Widget _buildTabContent(String userId) {
-    switch (_activeTab) {
-      case 1:
-        return Consumer(
-          builder: (context, ref, _) {
-            final photosAsync = ref.watch(profilePhotosProvider(userId));
-            return photosAsync.when(
-              data: (photos) => ProfilePhotoGrid(photoAssets: photos),
-              loading: () => const Padding(
-                padding: EdgeInsets.all(24),
-                child: Center(child: CircularProgressIndicator(color: AppColors.primary)),
-              ),
-              error: (error, stackTrace) => const SizedBox.shrink(),
-            );
-          },
-        );
-      case 2:
-        return Consumer(
-          builder: (context, ref, _) {
-            final videosAsync = ref.watch(videosProvider);
-            return videosAsync.when(
-              data: (videos) => ProfileVideoGrid(videos: videos),
-              loading: () => const Padding(
-                padding: EdgeInsets.all(24),
-                child: Center(child: CircularProgressIndicator(color: AppColors.primary)),
-              ),
-              error: (error, stackTrace) => const SizedBox.shrink(),
-            );
-          },
-        );
-      default:
-        return Consumer(
-          builder: (context, ref, _) {
-            final postsAsync = ref.watch(profilePostsProvider(userId));
-            return postsAsync.when(
-              data: (posts) => Column(
-                children: [
-                  for (final post in posts)
-                    PostCard(
-                      post: post,
-                      onSendTap: () => showSendToSheet(context),
-                      onShareTap: () => showShareSheet(context),
-                      onMoreTap: (position) => showPostOptionsMenu(context, post.id, position),
-                    ),
-                ],
-              ),
-              loading: () => const Padding(
-                padding: EdgeInsets.all(24),
-                child: Center(child: CircularProgressIndicator(color: AppColors.primary)),
-              ),
-              error: (error, stackTrace) => const SizedBox.shrink(),
-            );
-          },
-        );
-    }
+class _ProfileTabBody extends StatelessWidget {
+  const _ProfileTabBody({required this.storageKey, required this.child});
+
+  final String storageKey;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Builder(
+      builder: (context) => CustomScrollView(
+        key: PageStorageKey<String>(storageKey),
+        slivers: [
+          SliverOverlapInjector(handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context)),
+          SliverToBoxAdapter(child: child),
+          const SliverToBoxAdapter(child: SizedBox(height: 24)),
+        ],
+      ),
+    );
+  }
+}
+
+class _StickyTabBarDelegate extends SliverPersistentHeaderDelegate {
+  _StickyTabBarDelegate({required this.tabController});
+
+  final TabController tabController;
+
+  static const double _height = 64;
+
+  @override
+  double get minExtent => _height;
+
+  @override
+  double get maxExtent => _height;
+
+  @override
+  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
+    return ColoredBox(
+      color: AppColors.white,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 12, 20, 12),
+        child: AnimatedBuilder(
+          animation: tabController,
+          builder: (context, _) => ProfileTabBar(
+            activeIndex: tabController.index,
+            onChanged: tabController.animateTo,
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  bool shouldRebuild(covariant _StickyTabBarDelegate oldDelegate) {
+    return oldDelegate.tabController != tabController;
   }
 }

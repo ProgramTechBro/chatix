@@ -36,6 +36,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
             itemCount: widget.videos.length,
             onPageChanged: (index) => setState(() => _currentIndex = index),
             itemBuilder: (context, index) => ReelVideoItem(
+              key: ValueKey(widget.videos[index].id),
               video: widget.videos[index],
               isActive: index == _currentIndex,
             ),
