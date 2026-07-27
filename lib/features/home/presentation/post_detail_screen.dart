@@ -39,7 +39,7 @@ class PostDetailScreen extends ConsumerWidget {
                   onLikeTap: () => ref.read(feedControllerProvider.notifier).toggleLike(post.id),
                   onSendTap: () => showSendToSheet(context),
                   onShareTap: () => showShareSheet(context),
-                  onMoreTap: (position) => showPostOptionsMenu(context, position),
+                  onMoreTap: (position) => showPostOptionsMenu(context, post.id, position),
                 ),
                 Expanded(
                   child: Consumer(

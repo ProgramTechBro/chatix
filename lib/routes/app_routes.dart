@@ -8,6 +8,12 @@ class AppRoutes {
   static const String home = '/home';
   static const String chats = '/chats';
   static const String postDetail = '/post-detail/:postId';
+  static const String reportPost = '/report/:postId';
+  static const String search = '/search';
+  static const String profile = '/profile/:userId';
+  static const String videoPlayer = '/video-player';
 
   static String postDetailPath(String postId) => '/post-detail/$postId';
+  static String reportPostPath(String postId) => '/report/$postId';
+  static String profilePath(String userId) => '/profile/$userId';
 }

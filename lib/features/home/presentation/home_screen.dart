@@ -32,7 +32,8 @@ class HomeScreen extends ConsumerWidget {
             ),
             HomeTopBar(
               userName: 'Jack miller',
-              onSearchTap: () {},
+              onAvatarTap: () => context.push(AppRoutes.profilePath('me')),
+              onSearchTap: () => context.push(AppRoutes.search),
               onMessageTap: () => context.push(AppRoutes.chats),
               onAddTap: () {},
             ),
@@ -47,11 +48,12 @@ class HomeScreen extends ConsumerWidget {
                     final post = posts[index];
                     return PostCard(
                       post: post,
+                      onAuthorTap: () => context.push(AppRoutes.profilePath(post.authorId)),
                       onLikeTap: () => ref.read(feedControllerProvider.notifier).toggleLike(post.id),
                       onCommentTap: () => context.push(AppRoutes.postDetailPath(post.id)),
                       onSendTap: () => showSendToSheet(context),
                       onShareTap: () => showShareSheet(context),
-                      onMoreTap: (position) => showPostOptionsMenu(context, position),
+                      onMoreTap: (position) => showPostOptionsMenu(context, post.id, position),
                     );
                   },
                 ),

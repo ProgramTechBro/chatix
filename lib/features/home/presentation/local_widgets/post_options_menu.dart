@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../config/app_colors.dart';
+import '../../../../routes/app_routes.dart';
 
-Future<void> showPostOptionsMenu(BuildContext context, Offset tapPosition) {
+Future<void> showPostOptionsMenu(BuildContext context, String postId, Offset tapPosition) {
   final screenSize = MediaQuery.of(context).size;
   const menuWidth = 200.0;
   final left = (tapPosition.dx - menuWidth + 24).clamp(12.0, screenSize.width - menuWidth - 12.0);
@@ -20,7 +22,7 @@ Future<void> showPostOptionsMenu(BuildContext context, Offset tapPosition) {
             left: left,
             top: top,
             width: menuWidth,
-            child: const _PostOptionsCard(),
+            child: _PostOptionsCard(postId: postId),
           ),
         ],
       );
@@ -29,7 +31,9 @@ Future<void> showPostOptionsMenu(BuildContext context, Offset tapPosition) {
 }
 
 class _PostOptionsCard extends StatelessWidget {
-  const _PostOptionsCard();
+  const _PostOptionsCard({required this.postId});
+
+  final String postId;
 
   @override
   Widget build(BuildContext context) {
@@ -44,17 +48,20 @@ class _PostOptionsCard extends StatelessWidget {
             _OptionRow(
               icon: Icons.thumb_up_alt_outlined,
               label: 'Interested',
-              onTap: () => _selectOption(context, 'Marked as interested'),
+              onTap: () => _showFeedback(context, 'Marked as interested'),
             ),
             _OptionRow(
               icon: Icons.thumb_down_alt_outlined,
               label: 'Not Interested',
-              onTap: () => _selectOption(context, 'Marked as not interested'),
+              onTap: () => _showFeedback(context, 'Marked as not interested'),
             ),
             _OptionRow(
               icon: Icons.error_outline,
               label: 'Report',
-              onTap: () => _selectOption(context, 'Reported. Thanks for letting us know.'),
+              onTap: () {
+                Navigator.of(context).pop();
+                context.push(AppRoutes.reportPostPath(postId));
+              },
             ),
           ],
         ),
@@ -62,7 +69,7 @@ class _PostOptionsCard extends StatelessWidget {
     );
   }
 
-  void _selectOption(BuildContext context, String message) {
+  void _showFeedback(BuildContext context, String message) {
     Navigator.of(context).pop();
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
   }

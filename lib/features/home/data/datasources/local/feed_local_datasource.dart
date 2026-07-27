@@ -12,6 +12,7 @@ class FeedLocalDataSourceImpl implements FeedLocalDataSource {
   final List<PostModel> _posts = [
     const PostModel(
       id: '1',
+      authorId: 'u1',
       authorName: 'Mike tyson',
       authorAvatarUrl: AppNetworkImages.postAuthorMikeTyson,
       isVerified: true,
@@ -25,6 +26,7 @@ class FeedLocalDataSourceImpl implements FeedLocalDataSource {
     ),
     const PostModel(
       id: '2',
+      authorId: 'u_bitcoin',
       authorName: 'Bitcoin',
       authorAvatarUrl: AppNetworkImages.postAuthorBitcoin,
       isVerified: true,
@@ -47,6 +49,7 @@ class FeedLocalDataSourceImpl implements FeedLocalDataSource {
     final current = _posts[index];
     final updated = PostModel(
       id: current.id,
+      authorId: current.authorId,
       authorName: current.authorName,
       authorAvatarUrl: current.authorAvatarUrl,
       isVerified: current.isVerified,

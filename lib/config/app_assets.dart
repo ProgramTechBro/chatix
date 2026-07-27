@@ -7,6 +7,22 @@ class AppImages {
   static const String welcomeHero = '${_base}welcome_hero.jpg';
   static const String feedPost1 = '${_base}feed_post_1.jpg';
   static const String feedPost2 = '${_base}feed_post_2.jpg';
+
+  static const String profileCover = '${_base}profile_cover.jpg';
+  static const String profileAvatar = '${_base}profile_avatar.jpg';
+  static const String profilePhoto1 = '${_base}profile_photo_1.jpg';
+  static const String profilePhoto2 = '${_base}profile_photo_2.jpg';
+  static const String profilePhoto3 = '${_base}profile_photo_3.jpg';
+  static const String profilePhoto4 = '${_base}profile_photo_4.jpg';
+  static const String profilePhoto5 = '${_base}profile_photo_5.jpg';
+  static const String profilePhoto6 = '${_base}profile_photo_6.jpg';
+
+  static const String videoThumb1 = '${_base}video_thumb_1.jpg';
+  static const String videoThumb2 = '${_base}video_thumb_2.jpg';
+  static const String videoThumb3 = '${_base}video_thumb_3.jpg';
+  static const String videoThumb4 = '${_base}video_thumb_4.jpg';
+  static const String videoThumb5 = '${_base}video_thumb_5.jpg';
+  static const String videoThumb6 = '${_base}video_thumb_6.jpg';
 }
 
 class AppIcons {
@@ -52,4 +68,7 @@ class AppNetworkImages {
   static const String contactSultan = 'https://i.pravatar.cc/150?img=52';
   static const String contactJoshim = 'https://i.pravatar.cc/150?img=53';
   static const String contactAlbert = 'https://i.pravatar.cc/150?img=60';
+  static const String contactMohanaJerin = 'https://i.pravatar.cc/150?img=48';
+  static const String contactPinky = 'https://i.pravatar.cc/150?img=47';
+  static const String contactJohannaWest = 'https://i.pravatar.cc/150?img=45';
 }
