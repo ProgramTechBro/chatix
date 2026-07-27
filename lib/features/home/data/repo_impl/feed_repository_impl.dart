@@ -14,7 +14,7 @@ class FeedRepositoryImpl implements FeedRepository {
   @override
   Future<Either<Failure, List<PostEntity>>> getFeedPosts() async {
     final posts = await _localDataSource.getFeedPosts();
-    return Right(posts);
+    return Right(List<PostEntity>.of(posts));
   }
 
   @override
