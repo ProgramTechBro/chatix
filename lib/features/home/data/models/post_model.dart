@@ -3,6 +3,7 @@ import '../../domain/entities/post_entity.dart';
 class PostModel extends PostEntity {
   const PostModel({
     required super.id,
+    required super.authorId,
     required super.authorName,
     required super.authorAvatarUrl,
     required super.isVerified,

@@ -9,6 +9,7 @@ class PostCard extends StatelessWidget {
   const PostCard({
     super.key,
     required this.post,
+    this.onAuthorTap,
     this.onLikeTap,
     this.onCommentTap,
     this.onSendTap,
@@ -17,6 +18,7 @@ class PostCard extends StatelessWidget {
   });
 
   final PostEntity post;
+  final VoidCallback? onAuthorTap;
   final VoidCallback? onLikeTap;
   final VoidCallback? onCommentTap;
   final VoidCallback? onSendTap;
@@ -43,15 +45,28 @@ class PostCard extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      CircleAvatar(radius: 16, backgroundImage: NetworkImage(post.authorAvatarUrl)),
-                      const SizedBox(width: 8),
-                      Text(post.authorName, style: textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w500)),
-                      if (post.isVerified) ...[
-                        const SizedBox(width: 4),
-                        SvgPicture.asset(AppIcons.postVerifiedBadge, width: 16, height: 16),
-                      ],
-                      const SizedBox(width: 4),
-                      Text('· ${post.postedAgo}', style: textTheme.bodyMedium?.copyWith(color: AppColors.textSecondary)),
+                      GestureDetector(
+                        onTap: onAuthorTap,
+                        child: Row(
+                          children: [
+                            CircleAvatar(radius: 16, backgroundImage: NetworkImage(post.authorAvatarUrl)),
+                            const SizedBox(width: 8),
+                            Text(
+                              post.authorName,
+                              style: textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
+                            ),
+                            if (post.isVerified) ...[
+                              const SizedBox(width: 4),
+                              SvgPicture.asset(AppIcons.postVerifiedBadge, width: 16, height: 16),
+                            ],
+                            const SizedBox(width: 4),
+                            Text(
+                              '· ${post.postedAgo}',
+                              style: textTheme.bodyMedium?.copyWith(color: AppColors.textSecondary),
+                            ),
+                          ],
+                        ),
+                      ),
                       const Spacer(),
                       GestureDetector(
                         onTapDown: (details) => onMoreTap?.call(details.globalPosition),

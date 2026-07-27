@@ -1,6 +1,7 @@
 class PostEntity {
   const PostEntity({
     required this.id,
+    required this.authorId,
     required this.authorName,
     required this.authorAvatarUrl,
     required this.isVerified,
@@ -14,6 +15,7 @@ class PostEntity {
   });
 
   final String id;
+  final String authorId;
   final String authorName;
   final String authorAvatarUrl;
   final bool isVerified;
@@ -28,6 +30,7 @@ class PostEntity {
   PostEntity copyWith({int? likeCount, bool? isLiked}) {
     return PostEntity(
       id: id,
+      authorId: authorId,
       authorName: authorName,
       authorAvatarUrl: authorAvatarUrl,
       isVerified: isVerified,

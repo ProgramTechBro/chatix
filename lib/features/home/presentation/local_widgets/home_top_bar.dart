@@ -7,12 +7,14 @@ class HomeTopBar extends StatelessWidget {
   const HomeTopBar({
     super.key,
     required this.userName,
+    this.onAvatarTap,
     this.onSearchTap,
     this.onMessageTap,
     this.onAddTap,
   });
 
   final String userName;
+  final VoidCallback? onAvatarTap;
   final VoidCallback? onSearchTap;
   final VoidCallback? onMessageTap;
   final VoidCallback? onAddTap;
@@ -23,15 +25,21 @@ class HomeTopBar extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
         children: [
-          const CircleAvatar(radius: 25, backgroundImage: NetworkImage(AppNetworkImages.currentUserAvatar)),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Text(
-              userName,
-              style: Theme.of(context).textTheme.titleMedium,
-              overflow: TextOverflow.ellipsis,
+          GestureDetector(
+            onTap: onAvatarTap,
+            child: Row(
+              children: [
+                const CircleAvatar(radius: 25, backgroundImage: NetworkImage(AppNetworkImages.currentUserAvatar)),
+                const SizedBox(width: 16),
+                Text(
+                  userName,
+                  style: Theme.of(context).textTheme.titleMedium,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
             ),
           ),
+          const Spacer(),
           _TopBarIconButton(icon: AppIcons.homeSearch, onTap: onSearchTap),
           const SizedBox(width: 16),
           _TopBarIconButton(icon: AppIcons.homeMessage, onTap: onMessageTap),

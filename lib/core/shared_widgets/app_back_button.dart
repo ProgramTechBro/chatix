@@ -3,7 +3,9 @@ import 'package:go_router/go_router.dart';
 import '../../config/app_colors.dart';
 
 class AppBackButton extends StatelessWidget {
-  const AppBackButton({super.key});
+  const AppBackButton({super.key, this.color = AppColors.black});
+
+  final Color color;
 
   @override
   Widget build(BuildContext context) {
@@ -13,7 +15,7 @@ class AppBackButton extends StatelessWidget {
           context.pop();
         }
       },
-      icon: const Icon(Icons.arrow_back_rounded, color: AppColors.black),
+      icon: Icon(Icons.arrow_back_rounded, color: color),
     );
   }
 }

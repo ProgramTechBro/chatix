@@ -14,7 +14,7 @@ class MainScreen extends ConsumerWidget {
   static const List<Widget> _pages = [
     HomeScreen(),
     VideosScreen(),
-    ProfileScreen(),
+    ProfileScreen(userId: 'me'),
     NotificationsScreen(),
     SettingsScreen(),
   ];
