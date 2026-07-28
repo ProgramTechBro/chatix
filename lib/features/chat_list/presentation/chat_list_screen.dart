@@ -67,7 +67,8 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen> {
                       final chat = filtered[index];
                       return ChatListCard(
                         chat: chat,
-                        onTap: () => context.push(AppRoutes.profilePath(chat.userId)),
+                        onAvatarTap: () => context.push(AppRoutes.profilePath(chat.userId)),
+                        onTap: () => context.push(AppRoutes.chatDetail, extra: chat),
                       );
                     },
                   );

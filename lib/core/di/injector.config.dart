@@ -16,6 +16,15 @@ import 'package:chatix/features/auth/domain/usecases/send_otp_usecase.dart'
     as _i544;
 import 'package:chatix/features/auth/domain/usecases/verify_otp_usecase.dart'
     as _i943;
+import 'package:chatix/features/chat/data/datasources/local/chat_local_datasource.dart'
+    as _i430;
+import 'package:chatix/features/chat/data/repo/chat_repository.dart' as _i1007;
+import 'package:chatix/features/chat/data/repo_impl/chat_repository_impl.dart'
+    as _i782;
+import 'package:chatix/features/chat/domain/usecases/send_message_usecase.dart'
+    as _i994;
+import 'package:chatix/features/chat/domain/usecases/watch_messages_usecase.dart'
+    as _i642;
 import 'package:chatix/features/chat_list/data/datasources/local/chat_list_local_datasource.dart'
     as _i110;
 import 'package:chatix/features/chat_list/data/repo/chat_list_repository.dart'
@@ -98,6 +107,9 @@ extension GetItInjectableX on _i174.GetIt {
     _i526.EnvironmentFilter? environmentFilter,
   }) {
     final gh = _i526.GetItHelper(this, environment, environmentFilter);
+    gh.lazySingleton<_i430.ChatLocalDataSource>(
+      () => _i430.ChatLocalDataSourceImpl(),
+    );
     gh.lazySingleton<_i2.ShareContactsLocalDataSource>(
       () => _i2.ShareContactsLocalDataSourceImpl(),
     );
@@ -137,6 +149,9 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i276.VideosRepository>(
       () => _i75.VideosRepositoryImpl(gh<_i164.VideosLocalDataSource>()),
     );
+    gh.lazySingleton<_i1007.ChatRepository>(
+      () => _i782.ChatRepositoryImpl(gh<_i430.ChatLocalDataSource>()),
+    );
     gh.lazySingleton<_i321.ReportRepository>(
       () => _i519.ReportRepositoryImpl(gh<_i187.ReportLocalDataSource>()),
     );
@@ -145,6 +160,12 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.lazySingleton<_i217.FeedRepository>(
       () => _i244.FeedRepositoryImpl(gh<_i400.FeedLocalDataSource>()),
+    );
+    gh.factory<_i994.SendMessageUseCase>(
+      () => _i994.SendMessageUseCase(gh<_i1007.ChatRepository>()),
+    );
+    gh.factory<_i642.WatchMessagesUseCase>(
+      () => _i642.WatchMessagesUseCase(gh<_i1007.ChatRepository>()),
     );
     gh.factory<_i262.GetVideosUseCase>(
       () => _i262.GetVideosUseCase(gh<_i276.VideosRepository>()),

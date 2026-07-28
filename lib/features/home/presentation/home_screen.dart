@@ -35,7 +35,7 @@ class HomeScreen extends ConsumerWidget {
               onAvatarTap: () => context.push(AppRoutes.profilePath('me')),
               onSearchTap: () => context.push(AppRoutes.search),
               onMessageTap: () => context.push(AppRoutes.chats),
-              onAddTap: () {},
+              onAddTap: () => context.push(AppRoutes.createPost),
             ),
             const SizedBox(height: 16),
             const Divider(color: AppColors.divider, height: 1, thickness: 1),

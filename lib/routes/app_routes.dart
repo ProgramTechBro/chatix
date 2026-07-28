@@ -12,6 +12,8 @@ class AppRoutes {
   static const String search = '/search';
   static const String profile = '/profile/:userId';
   static const String videoPlayer = '/video-player';
+  static const String createPost = '/create-post';
+  static const String chatDetail = '/chat-detail';
 
   static String postDetailPath(String postId) => '/post-detail/$postId';
   static String reportPostPath(String postId) => '/report/$postId';

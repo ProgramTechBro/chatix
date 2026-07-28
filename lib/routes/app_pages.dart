@@ -2,7 +2,10 @@ import 'package:go_router/go_router.dart';
 import '../features/auth/presentation/login_screen.dart';
 import '../features/auth/presentation/register_screen.dart';
 import '../features/auth/presentation/welcome_screen.dart';
+import '../features/chat/presentation/chat_screen.dart';
+import '../features/chat_list/domain/entities/chat_summary_entity.dart';
 import '../features/chat_list/presentation/chat_list_screen.dart';
+import '../features/home/presentation/create_post_screen.dart';
 import '../features/home/presentation/post_detail_screen.dart';
 import '../features/home/presentation/report_post_screen.dart';
 import '../features/main/presentation/main_screen.dart';
@@ -65,6 +68,14 @@ final GoRouter appRouter = GoRouter(
           initialIndex: extra['initialIndex']! as int,
         );
       },
+    ),
+    GoRoute(
+      path: AppRoutes.createPost,
+      builder: (context, state) => const CreatePostScreen(),
+    ),
+    GoRoute(
+      path: AppRoutes.chatDetail,
+      builder: (context, state) => ChatScreen(chat: state.extra! as ChatSummaryEntity),
     ),
   ],
 );
