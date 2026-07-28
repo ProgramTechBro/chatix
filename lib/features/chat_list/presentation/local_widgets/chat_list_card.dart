@@ -3,27 +3,31 @@ import '../../../../config/app_colors.dart';
 import '../../domain/entities/chat_summary_entity.dart';
 
 class ChatListCard extends StatelessWidget {
-  const ChatListCard({super.key, required this.chat, this.onTap});
+  const ChatListCard({super.key, required this.chat, this.onAvatarTap, this.onTap});
 
   final ChatSummaryEntity chat;
+  final VoidCallback? onAvatarTap;
   final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
 
-    return InkWell(
-      onTap: onTap,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: Row(
-          children: [
-            Padding(
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Row(
+        children: [
+          GestureDetector(
+            onTap: onAvatarTap,
+            child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 8),
               child: CircleAvatar(radius: 32, backgroundImage: NetworkImage(chat.avatarUrl)),
             ),
-            const SizedBox(width: 16),
-            Expanded(
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: InkWell(
+              onTap: onTap,
               child: Container(
                 decoration: const BoxDecoration(
                   border: Border(bottom: BorderSide(color: AppColors.divider)),
@@ -56,8 +60,8 @@ class ChatListCard extends StatelessWidget {
                 ),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
