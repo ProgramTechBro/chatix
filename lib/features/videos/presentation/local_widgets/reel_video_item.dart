@@ -6,67 +6,20 @@ import '../../../../config/app_colors.dart';
 import '../../../../core/utils/helpers/formatters.dart';
 import '../../domain/entities/video_entity.dart';
 
-class ReelVideoItem extends StatefulWidget {
-  const ReelVideoItem({super.key, required this.video, required this.isActive});
+class ReelVideoItem extends StatelessWidget {
+  const ReelVideoItem({super.key, required this.video, required this.controller});
 
   final VideoEntity video;
-  final bool isActive;
-
-  @override
-  State<ReelVideoItem> createState() => _ReelVideoItemState();
-}
-
-class _ReelVideoItemState extends State<ReelVideoItem> {
-  VideoPlayerController? _controller;
-  bool _isInitialized = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _initialize();
-  }
-
-  Future<void> _initialize() async {
-    final controller = VideoPlayerController.networkUrl(Uri.parse(widget.video.videoUrl));
-    _controller = controller;
-    await controller.initialize();
-    await controller.setLooping(true);
-    if (!mounted) return;
-    setState(() => _isInitialized = true);
-    if (widget.isActive) {
-      controller.play();
-    }
-  }
-
-  @override
-  void didUpdateWidget(covariant ReelVideoItem oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    final controller = _controller;
-    if (controller == null || !_isInitialized) return;
-    if (widget.isActive && !oldWidget.isActive) {
-      controller.play();
-    } else if (!widget.isActive && oldWidget.isActive) {
-      controller.pause();
-    }
-  }
-
-  @override
-  void dispose() {
-    _controller?.dispose();
-    super.dispose();
-  }
+  final VideoPlayerController? controller;
 
   void _togglePlayPause() {
-    final controller = _controller;
-    if (controller == null) return;
-    setState(() {
-      controller.value.isPlaying ? controller.pause() : controller.play();
-    });
+    final controller = this.controller;
+    if (controller == null || !controller.value.isInitialized) return;
+    controller.value.isPlaying ? controller.pause() : controller.play();
   }
 
   @override
   Widget build(BuildContext context) {
-    final controller = _controller;
     final textTheme = Theme.of(context).textTheme;
 
     return GestureDetector(
@@ -74,21 +27,38 @@ class _ReelVideoItemState extends State<ReelVideoItem> {
       child: Stack(
         fit: StackFit.expand,
         children: [
-          if (_isInitialized && controller != null)
-            FittedBox(
-              fit: BoxFit.cover,
-              child: SizedBox(
-                width: controller.value.size.width,
-                height: controller.value.size.height,
-                child: VideoPlayer(controller),
-              ),
+          if (controller != null)
+            AnimatedBuilder(
+              animation: controller!,
+              builder: (context, _) {
+                if (!controller!.value.isInitialized) {
+                  return Image.asset(video.thumbnailAsset, fit: BoxFit.cover);
+                }
+                return Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    FittedBox(
+                      fit: BoxFit.cover,
+                      child: SizedBox(
+                        width: controller!.value.size.width,
+                        height: controller!.value.size.height,
+                        child: VideoPlayer(controller!),
+                      ),
+                    ),
+                    if (!controller!.value.isPlaying)
+                      Center(
+                        child: Icon(
+                          Icons.play_arrow_rounded,
+                          size: 72,
+                          color: AppColors.white.withValues(alpha: 0.7),
+                        ),
+                      ),
+                  ],
+                );
+              },
             )
           else
-            Image.asset(widget.video.thumbnailAsset, fit: BoxFit.cover),
-          if (_isInitialized && controller != null && !controller.value.isPlaying)
-            Center(
-              child: Icon(Icons.play_arrow_rounded, size: 72, color: AppColors.white.withValues(alpha: 0.7)),
-            ),
+            Image.asset(video.thumbnailAsset, fit: BoxFit.cover),
           Positioned(
             left: 20,
             right: 90,
@@ -96,12 +66,9 @@ class _ReelVideoItemState extends State<ReelVideoItem> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  widget.video.authorName,
-                  style: textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w600),
-                ),
+                Text(video.authorName, style: textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w600)),
                 const SizedBox(height: 8),
-                Text(widget.video.caption, style: textTheme.bodyMedium?.copyWith(color: AppColors.white)),
+                Text(video.caption, style: textTheme.bodyMedium?.copyWith(color: AppColors.white)),
               ],
             ),
           ),
@@ -117,10 +84,7 @@ class _ReelVideoItemState extends State<ReelVideoItem> {
                   colorFilter: const ColorFilter.mode(AppColors.white, BlendMode.srcIn),
                 ),
                 const SizedBox(height: 4),
-                Text(
-                  formatCompactCount(widget.video.likeCount),
-                  style: textTheme.bodyMedium?.copyWith(color: AppColors.white),
-                ),
+                Text(formatCompactCount(video.likeCount), style: textTheme.bodyMedium?.copyWith(color: AppColors.white)),
               ],
             ),
           ),
