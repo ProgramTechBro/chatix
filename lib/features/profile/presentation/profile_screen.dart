@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../../config/app_colors.dart';
 import '../../../core/shared_widgets/app_back_button.dart';
-import '../../home/presentation/local_widgets/post_card.dart';
-import '../../home/presentation/local_widgets/post_options_menu.dart';
-import '../../home/presentation/local_widgets/send_to_sheet.dart';
-import '../../home/presentation/local_widgets/share_sheet.dart';
+import '../../../routes/app_routes.dart';
 import '../../videos/presentation/providers/videos_provider.dart';
 import 'local_widgets/profile_header.dart';
 import 'local_widgets/profile_photo_grid.dart';
+import 'local_widgets/profile_post_grid.dart';
 import 'local_widgets/profile_tab_bar.dart';
 import 'local_widgets/profile_video_grid.dart';
 import 'providers/profile_provider.dart';
@@ -63,16 +62,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> with SingleTicker
                       return postsAsync.when(
                         data: (posts) => _ProfileTabBody(
                           storageKey: 'posts',
-                          child: Column(
-                            children: [
-                              for (final post in posts)
-                                PostCard(
-                                  post: post,
-                                  onSendTap: () => showSendToSheet(context),
-                                  onShareTap: () => showShareSheet(context),
-                                  onMoreTap: (position) => showPostOptionsMenu(context, post.id, position),
-                                ),
-                            ],
+                          child: ProfilePostGrid(
+                            posts: posts,
+                            onPostTap: (_) => context.push(AppRoutes.profilePostsFeedPath(widget.userId)),
                           ),
                         ),
                         loading: () => const Center(child: CircularProgressIndicator(color: AppColors.primary)),

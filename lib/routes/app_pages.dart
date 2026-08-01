@@ -9,6 +9,7 @@ import '../features/home/presentation/create_post_screen.dart';
 import '../features/home/presentation/post_detail_screen.dart';
 import '../features/home/presentation/report_post_screen.dart';
 import '../features/main/presentation/main_screen.dart';
+import '../features/profile/presentation/profile_posts_feed_screen.dart';
 import '../features/profile/presentation/profile_screen.dart';
 import '../features/search/presentation/search_screen.dart';
 import '../features/splash/presentation/splash_screen.dart';
@@ -76,6 +77,10 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: AppRoutes.chatDetail,
       builder: (context, state) => ChatScreen(chat: state.extra! as ChatSummaryEntity),
+    ),
+    GoRoute(
+      path: AppRoutes.profilePostsFeed,
+      builder: (context, state) => ProfilePostsFeedScreen(userId: state.pathParameters['userId']!),
     ),
   ],
 );
