@@ -15,9 +15,17 @@ class AppRoutes {
   static const String createPost = '/create-post';
   static const String chatDetail = '/chat-detail';
   static const String profilePostsFeed = '/profile-posts/:userId';
+  static const String profilePostsGrid = '/posts/:userId';
+  static const String editProfile = '/edit-profile/:userId';
+  static const String following = '/following/:userId';
+  static const String followers = '/followers/:userId';
 
   static String postDetailPath(String postId) => '/post-detail/$postId';
   static String reportPostPath(String postId) => '/report/$postId';
   static String profilePath(String userId) => '/profile/$userId';
   static String profilePostsFeedPath(String userId) => '/profile-posts/$userId';
+  static String profilePostsGridPath(String userId) => '/posts/$userId';
+  static String editProfilePath(String userId) => '/edit-profile/$userId';
+  static String followingPath(String userId) => '/following/$userId';
+  static String followersPath(String userId) => '/followers/$userId';
 }

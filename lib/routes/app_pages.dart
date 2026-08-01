@@ -5,11 +5,15 @@ import '../features/auth/presentation/welcome_screen.dart';
 import '../features/chat/presentation/chat_screen.dart';
 import '../features/chat_list/domain/entities/chat_summary_entity.dart';
 import '../features/chat_list/presentation/chat_list_screen.dart';
+import '../features/connections/presentation/followers_screen.dart';
+import '../features/connections/presentation/following_screen.dart';
 import '../features/home/presentation/create_post_screen.dart';
 import '../features/home/presentation/post_detail_screen.dart';
 import '../features/home/presentation/report_post_screen.dart';
 import '../features/main/presentation/main_screen.dart';
+import '../features/profile/presentation/edit_profile_screen.dart';
 import '../features/profile/presentation/profile_posts_feed_screen.dart';
+import '../features/profile/presentation/profile_posts_grid_screen.dart';
 import '../features/profile/presentation/profile_screen.dart';
 import '../features/search/presentation/search_screen.dart';
 import '../features/splash/presentation/splash_screen.dart';
@@ -81,6 +85,22 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: AppRoutes.profilePostsFeed,
       builder: (context, state) => ProfilePostsFeedScreen(userId: state.pathParameters['userId']!),
+    ),
+    GoRoute(
+      path: AppRoutes.profilePostsGrid,
+      builder: (context, state) => ProfilePostsGridScreen(userId: state.pathParameters['userId']!),
+    ),
+    GoRoute(
+      path: AppRoutes.editProfile,
+      builder: (context, state) => EditProfileScreen(userId: state.pathParameters['userId']!),
+    ),
+    GoRoute(
+      path: AppRoutes.following,
+      builder: (context, state) => FollowingScreen(userId: state.pathParameters['userId']!),
+    ),
+    GoRoute(
+      path: AppRoutes.followers,
+      builder: (context, state) => FollowersScreen(userId: state.pathParameters['userId']!),
     ),
   ],
 );

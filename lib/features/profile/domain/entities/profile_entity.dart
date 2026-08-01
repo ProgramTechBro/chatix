@@ -8,6 +8,7 @@ class ProfileEntity {
     required this.followingCount,
     required this.followersCount,
     required this.postsCount,
+    required this.birthDate,
   });
 
   final String id;
@@ -18,4 +19,5 @@ class ProfileEntity {
   final int followingCount;
   final int followersCount;
   final int postsCount;
+  final String birthDate;
 }

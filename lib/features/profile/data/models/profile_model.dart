@@ -10,5 +10,6 @@ class ProfileModel extends ProfileEntity {
     required super.followingCount,
     required super.followersCount,
     required super.postsCount,
+    required super.birthDate,
   });
 }

@@ -10,11 +10,17 @@ class ProfileHeader extends StatelessWidget {
     required this.profile,
     this.onEditProfile,
     this.onShareProfile,
+    this.onFollowingTap,
+    this.onFollowersTap,
+    this.onPostsTap,
   });
 
   final ProfileEntity profile;
   final VoidCallback? onEditProfile;
   final VoidCallback? onShareProfile;
+  final VoidCallback? onFollowingTap;
+  final VoidCallback? onFollowersTap;
+  final VoidCallback? onPostsTap;
 
   @override
   Widget build(BuildContext context) {
@@ -77,11 +83,19 @@ class ProfileHeader extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  _StatColumn(value: formatCompactCount(profile.followingCount), label: 'Following'),
+                  _StatColumn(
+                    value: formatCompactCount(profile.followingCount),
+                    label: 'Following',
+                    onTap: onFollowingTap,
+                  ),
                   const SizedBox(width: 36),
-                  _StatColumn(value: formatCompactCount(profile.followersCount), label: 'Followers'),
+                  _StatColumn(
+                    value: formatCompactCount(profile.followersCount),
+                    label: 'Followers',
+                    onTap: onFollowersTap,
+                  ),
                   const SizedBox(width: 36),
-                  _StatColumn(value: '${profile.postsCount}', label: 'Posts'),
+                  _StatColumn(value: '${profile.postsCount}', label: 'Posts', onTap: onPostsTap),
                 ],
               ),
               const SizedBox(height: 16),
@@ -103,20 +117,24 @@ class ProfileHeader extends StatelessWidget {
 }
 
 class _StatColumn extends StatelessWidget {
-  const _StatColumn({required this.value, required this.label});
+  const _StatColumn({required this.value, required this.label, this.onTap});
 
   final String value;
   final String label;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
-    return Column(
-      children: [
-        Text(value, style: textTheme.titleSmall),
-        const SizedBox(height: 4),
-        Text(label, style: textTheme.bodyMedium?.copyWith(color: AppColors.textSecondary)),
-      ],
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        children: [
+          Text(value, style: textTheme.titleSmall),
+          const SizedBox(height: 4),
+          Text(label, style: textTheme.bodyMedium?.copyWith(color: AppColors.textSecondary)),
+        ],
+      ),
     );
   }
 }

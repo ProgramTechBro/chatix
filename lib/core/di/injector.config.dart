@@ -33,6 +33,16 @@ import 'package:chatix/features/chat_list/data/repo_impl/chat_list_repository_im
     as _i959;
 import 'package:chatix/features/chat_list/domain/usecases/get_chat_list_usecase.dart'
     as _i816;
+import 'package:chatix/features/connections/data/datasources/local/connections_local_datasource.dart'
+    as _i974;
+import 'package:chatix/features/connections/data/repo/connections_repository.dart'
+    as _i916;
+import 'package:chatix/features/connections/data/repo_impl/connections_repository_impl.dart'
+    as _i152;
+import 'package:chatix/features/connections/domain/usecases/get_followers_usecase.dart'
+    as _i248;
+import 'package:chatix/features/connections/domain/usecases/get_following_usecase.dart'
+    as _i1061;
 import 'package:chatix/features/home/data/datasources/local/comments_local_datasource.dart'
     as _i958;
 import 'package:chatix/features/home/data/datasources/local/feed_local_datasource.dart'
@@ -142,6 +152,9 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i400.FeedLocalDataSource>(
       () => _i400.FeedLocalDataSourceImpl(),
     );
+    gh.lazySingleton<_i974.ConnectionsLocalDataSource>(
+      () => _i974.ConnectionsLocalDataSourceImpl(),
+    );
     gh.lazySingleton<_i958.CommentsLocalDataSource>(
       () => _i958.CommentsLocalDataSourceImpl(),
     );
@@ -183,6 +196,11 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i642.WatchMessagesUseCase>(
       () => _i642.WatchMessagesUseCase(gh<_i1007.ChatRepository>()),
     );
+    gh.lazySingleton<_i916.ConnectionsRepository>(
+      () => _i152.ConnectionsRepositoryImpl(
+        gh<_i974.ConnectionsLocalDataSource>(),
+      ),
+    );
     gh.factory<_i262.GetVideosUseCase>(
       () => _i262.GetVideosUseCase(gh<_i276.VideosRepository>()),
     );
@@ -218,6 +236,12 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factory<_i949.SearchUsersUseCase>(
       () => _i949.SearchUsersUseCase(gh<_i736.SearchRepository>()),
+    );
+    gh.factory<_i248.GetFollowersUseCase>(
+      () => _i248.GetFollowersUseCase(gh<_i916.ConnectionsRepository>()),
+    );
+    gh.factory<_i1061.GetFollowingUseCase>(
+      () => _i1061.GetFollowingUseCase(gh<_i916.ConnectionsRepository>()),
     );
     gh.factory<_i999.GetShareContactsUseCase>(
       () => _i999.GetShareContactsUseCase(gh<_i156.ShareContactsRepository>()),
