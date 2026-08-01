@@ -6,7 +6,11 @@ class VideoModel extends VideoEntity {
     required super.videoUrl,
     required super.thumbnailAsset,
     required super.authorName,
+    required super.authorAvatarUrl,
     required super.caption,
     required super.likeCount,
+    required super.commentCount,
+    required super.shareCount,
+    required super.saveCount,
   });
 }

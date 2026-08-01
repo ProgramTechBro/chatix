@@ -1,0 +1,1 @@
+enum VideosTab { forYou, following }

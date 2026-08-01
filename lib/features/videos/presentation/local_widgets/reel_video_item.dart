@@ -62,34 +62,103 @@ class ReelVideoItem extends StatelessWidget {
           Positioned(
             left: 20,
             right: 90,
-            bottom: 40,
+            bottom: 25,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(video.authorName, style: textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w600)),
+                Text(video.authorName, style: textTheme.titleSmall?.copyWith(color: AppColors.white)),
                 const SizedBox(height: 8),
-                Text(video.caption, style: textTheme.bodyMedium?.copyWith(color: AppColors.white)),
+                Text(video.caption, style: textTheme.labelMedium),
               ],
             ),
           ),
           Positioned(
-            right: 20,
-            bottom: 40,
-            child: Column(
-              children: [
-                SvgPicture.asset(
-                  AppIcons.postLike,
-                  width: 28,
-                  height: 28,
-                  colorFilter: const ColorFilter.mode(AppColors.white, BlendMode.srcIn),
-                ),
-                const SizedBox(height: 4),
-                Text(formatCompactCount(video.likeCount), style: textTheme.bodyMedium?.copyWith(color: AppColors.white)),
-              ],
-            ),
+            right: 12,
+            bottom: 150,
+            child: _ActionRail(video: video),
           ),
         ],
       ),
+    );
+  }
+}
+
+class _ActionRail extends StatelessWidget {
+  const _ActionRail({required this.video});
+
+  final VideoEntity video;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+      decoration: BoxDecoration(
+        color: AppColors.black.withValues(alpha: 0.25),
+        borderRadius: BorderRadius.circular(100),
+      ),
+      child: Column(
+        children: [
+          Stack(
+            clipBehavior: Clip.none,
+            children: [
+              CircleAvatar(radius: 16, backgroundImage: NetworkImage(video.authorAvatarUrl)),
+              const Positioned(
+                right: -2,
+                bottom: -2,
+                child: Icon(Icons.add_circle_rounded, size: 16, color: AppColors.primary),
+              ),
+            ],
+          ),
+          const SizedBox(height: 24),
+          _ActionItem(icon: AppIcons.postLike, count: video.likeCount),
+          const SizedBox(height: 24),
+          _ActionItem(icon: AppIcons.postComment, count: video.commentCount),
+          const SizedBox(height: 24),
+          _ActionItem(icon: AppIcons.postShare, count: video.shareCount),
+          const SizedBox(height: 24),
+          _SaveActionItem(count: video.saveCount),
+        ],
+      ),
+    );
+  }
+}
+
+class _ActionItem extends StatelessWidget {
+  const _ActionItem({required this.icon, required this.count});
+
+  final String icon;
+  final int count;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        SvgPicture.asset(
+          icon,
+          width: 24,
+          height: 24,
+          colorFilter: const ColorFilter.mode(AppColors.white, BlendMode.srcIn),
+        ),
+        const SizedBox(height: 8),
+        Text(formatCompactCount(count), style: Theme.of(context).textTheme.labelMedium),
+      ],
+    );
+  }
+}
+
+class _SaveActionItem extends StatelessWidget {
+  const _SaveActionItem({required this.count});
+
+  final int count;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        const Icon(Icons.bookmark_border_rounded, size: 24, color: AppColors.white),
+        const SizedBox(height: 8),
+        Text(formatCompactCount(count), style: Theme.of(context).textTheme.labelMedium),
+      ],
     );
   }
 }

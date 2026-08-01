@@ -43,7 +43,14 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> with SingleTicker
             data: (profile) => NestedScrollView(
               headerSliverBuilder: (context, innerBoxIsScrolled) => [
                 SliverToBoxAdapter(
-                  child: ProfileHeader(profile: profile, onEditProfile: () {}, onShareProfile: () {}),
+                  child: ProfileHeader(
+                    profile: profile,
+                    onEditProfile: () => context.push(AppRoutes.editProfilePath(widget.userId)),
+                    onShareProfile: () {},
+                    onFollowingTap: () => context.push(AppRoutes.followingPath(widget.userId)),
+                    onFollowersTap: () => context.push(AppRoutes.followersPath(widget.userId)),
+                    onPostsTap: () => context.push(AppRoutes.profilePostsGridPath(widget.userId)),
+                  ),
                 ),
                 SliverOverlapAbsorber(
                   handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),

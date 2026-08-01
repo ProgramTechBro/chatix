@@ -23,6 +23,7 @@ class ProfileLocalDataSourceImpl implements ProfileLocalDataSource {
       followingCount: 23000,
       followersCount: 635000,
       postsCount: 102,
+      birthDate: '27/07/2006',
     );
   }
 
