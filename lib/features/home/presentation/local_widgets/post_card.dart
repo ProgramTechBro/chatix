@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../../../../config/app_assets.dart';
 import '../../../../config/app_colors.dart';
+import '../../../../core/enums/post_media_type.dart';
 import '../../../../core/utils/helpers/formatters.dart';
 import '../../domain/entities/post_entity.dart';
+import 'inline_post_video.dart';
 
 class PostCard extends StatelessWidget {
   const PostCard({
@@ -93,7 +95,9 @@ class PostCard extends StatelessWidget {
             const SizedBox(height: 16),
             AspectRatio(
               aspectRatio: 353 / 296,
-              child: Image.asset(post.imageAsset, fit: BoxFit.cover, width: double.infinity),
+              child: post.mediaType == PostMediaType.video && post.videoUrl != null
+                  ? InlinePostVideo(videoUrl: post.videoUrl!, thumbnailAsset: post.imageAsset)
+                  : Image.asset(post.imageAsset, fit: BoxFit.cover, width: double.infinity),
             ),
             const SizedBox(height: 16),
             Padding(

@@ -65,6 +65,14 @@ import 'package:chatix/features/home/domain/usecases/submit_post_report_usecase.
     as _i146;
 import 'package:chatix/features/home/domain/usecases/toggle_like_post_usecase.dart'
     as _i802;
+import 'package:chatix/features/notifications/data/datasources/local/notifications_local_datasource.dart'
+    as _i580;
+import 'package:chatix/features/notifications/data/repo/notifications_repository.dart'
+    as _i224;
+import 'package:chatix/features/notifications/data/repo_impl/notifications_repository_impl.dart'
+    as _i874;
+import 'package:chatix/features/notifications/domain/usecases/get_notifications_usecase.dart'
+    as _i653;
 import 'package:chatix/features/profile/data/datasources/local/profile_local_datasource.dart'
     as _i508;
 import 'package:chatix/features/profile/data/repo/profile_repository.dart'
@@ -110,6 +118,9 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i430.ChatLocalDataSource>(
       () => _i430.ChatLocalDataSourceImpl(),
     );
+    gh.lazySingleton<_i580.NotificationsLocalDataSource>(
+      () => _i580.NotificationsLocalDataSourceImpl(),
+    );
     gh.lazySingleton<_i2.ShareContactsLocalDataSource>(
       () => _i2.ShareContactsLocalDataSourceImpl(),
     );
@@ -154,6 +165,11 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.lazySingleton<_i321.ReportRepository>(
       () => _i519.ReportRepositoryImpl(gh<_i187.ReportLocalDataSource>()),
+    );
+    gh.lazySingleton<_i224.NotificationsRepository>(
+      () => _i874.NotificationsRepositoryImpl(
+        gh<_i580.NotificationsLocalDataSource>(),
+      ),
     );
     gh.lazySingleton<_i903.CommentsRepository>(
       () => _i6.CommentsRepositoryImpl(gh<_i958.CommentsLocalDataSource>()),
@@ -205,6 +221,9 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factory<_i999.GetShareContactsUseCase>(
       () => _i999.GetShareContactsUseCase(gh<_i156.ShareContactsRepository>()),
+    );
+    gh.factory<_i653.GetNotificationsUseCase>(
+      () => _i653.GetNotificationsUseCase(gh<_i224.NotificationsRepository>()),
     );
     gh.factory<_i146.SubmitPostReportUseCase>(
       () => _i146.SubmitPostReportUseCase(gh<_i321.ReportRepository>()),

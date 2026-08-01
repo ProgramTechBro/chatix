@@ -60,6 +60,8 @@ class FeedLocalDataSourceImpl implements FeedLocalDataSource {
       commentCount: current.commentCount,
       shareCount: current.shareCount,
       isLiked: !current.isLiked,
+      mediaType: current.mediaType,
+      videoUrl: current.videoUrl,
     );
     _posts[index] = updated;
     return updated;

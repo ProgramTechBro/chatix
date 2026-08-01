@@ -71,4 +71,9 @@ class AppNetworkImages {
   static const String contactMohanaJerin = 'https://i.pravatar.cc/150?img=48';
   static const String contactPinky = 'https://i.pravatar.cc/150?img=47';
   static const String contactJohannaWest = 'https://i.pravatar.cc/150?img=45';
+
+  static const String contactLarryKovet = 'https://i.pravatar.cc/150?img=20';
+  static const String contactMarianaJerin = 'https://i.pravatar.cc/150?img=21';
+  static const String contactDKarry = 'https://i.pravatar.cc/150?img=22';
+  static const String contactWahidZaman = 'https://i.pravatar.cc/150?img=23';
 }

@@ -1,3 +1,5 @@
+import '../../../../core/enums/post_media_type.dart';
+
 class PostEntity {
   const PostEntity({
     required this.id,
@@ -12,6 +14,8 @@ class PostEntity {
     required this.commentCount,
     required this.shareCount,
     required this.isLiked,
+    this.mediaType = PostMediaType.image,
+    this.videoUrl,
   });
 
   final String id;
@@ -26,6 +30,8 @@ class PostEntity {
   final int commentCount;
   final int shareCount;
   final bool isLiked;
+  final PostMediaType mediaType;
+  final String? videoUrl;
 
   PostEntity copyWith({int? likeCount, bool? isLiked}) {
     return PostEntity(
@@ -41,6 +47,8 @@ class PostEntity {
       commentCount: commentCount,
       shareCount: shareCount,
       isLiked: isLiked ?? this.isLiked,
+      mediaType: mediaType,
+      videoUrl: videoUrl,
     );
   }
 }

@@ -1,3 +1,4 @@
+import '../../../../core/enums/post_media_type.dart';
 import '../../domain/entities/post_entity.dart';
 
 class PostModel extends PostEntity {
@@ -14,5 +15,7 @@ class PostModel extends PostEntity {
     required super.commentCount,
     required super.shareCount,
     required super.isLiked,
+    super.mediaType = PostMediaType.image,
+    super.videoUrl,
   });
 }
