@@ -1,41 +1,110 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../../core/di/injector.dart';
 import '../../../../core/enums/request_status.dart';
-import '../../domain/usecases/send_otp_usecase.dart';
-import '../../domain/usecases/verify_otp_usecase.dart';
+import '../../../../core/providers/auth/auth_provider.dart';
+import '../../domain/params/email_auth_params.dart';
+import '../../domain/params/phone_otp_params.dart';
+import '../../domain/usecases/confirm_phone_otp_usecase.dart';
+import '../../domain/usecases/sign_in_with_email_usecase.dart';
+import '../../domain/usecases/sign_up_with_email_usecase.dart';
+import '../../domain/usecases/verify_phone_number_usecase.dart';
 import 'auth_state.dart';
 
 part 'auth_provider.g.dart';
 
 @riverpod
 class AuthNotifier extends _$AuthNotifier {
-  late final SendOtpUseCase _sendOtp = getIt<SendOtpUseCase>();
-  late final VerifyOtpUseCase _verifyOtp = getIt<VerifyOtpUseCase>();
+  late final VerifyPhoneNumberUseCase _verifyPhoneNumber =
+      getIt<VerifyPhoneNumberUseCase>();
+  late final ConfirmPhoneOtpUseCase _confirmPhoneOtp =
+      getIt<ConfirmPhoneOtpUseCase>();
+  late final SignInWithEmailUseCase _signInWithEmail =
+      getIt<SignInWithEmailUseCase>();
+  late final SignUpWithEmailUseCase _signUpWithEmail =
+      getIt<SignUpWithEmailUseCase>();
 
   @override
   AuthState build() => const AuthState();
 
-  Future<void> sendOtp(String phoneNumber) async {
-    state = state.copyWith(status: RequestStatus.loading);
-    final result = await _sendOtp(phoneNumber);
+  Future<void> verifyPhoneNumber(String phoneNumber) async {
+    state = state.copyWith(status: RequestStatus.loading, errorMessage: null);
+    final result = await _verifyPhoneNumber(phoneNumber);
     result.fold(
       (failure) => state = state.copyWith(
         status: RequestStatus.failure,
         errorMessage: failure.message,
       ),
-      (_) => state = state.copyWith(status: RequestStatus.success),
+      (verificationId) => state = state.copyWith(
+        status: RequestStatus.success,
+        verificationId: verificationId,
+      ),
     );
   }
 
-  Future<void> verifyOtp(String code) async {
-    state = state.copyWith(status: RequestStatus.loading);
-    final result = await _verifyOtp(code);
+  Future<void> confirmPhoneOtp({
+    required String smsCode,
+    required String phoneNumber,
+    required String name,
+  }) async {
+    final verificationId = state.verificationId;
+    if (verificationId == null) return;
+
+    state = state.copyWith(status: RequestStatus.loading, errorMessage: null);
+    final result = await _confirmPhoneOtp(
+      PhoneOtpParams(
+        verificationId: verificationId,
+        smsCode: smsCode,
+        phoneNumber: phoneNumber,
+        name: name,
+      ),
+    );
     result.fold(
       (failure) => state = state.copyWith(
         status: RequestStatus.failure,
         errorMessage: failure.message,
       ),
-      (_) => state = state.copyWith(status: RequestStatus.success),
+      (user) {
+        state = state.copyWith(status: RequestStatus.success, user: user);
+        ref.read(sessionControllerProvider.notifier).setUser(user);
+      },
+    );
+  }
+
+  Future<void> signInWithEmail(String email, String password) async {
+    state = state.copyWith(status: RequestStatus.loading, errorMessage: null);
+    final result = await _signInWithEmail(
+      EmailAuthParams(email: email, password: password),
+    );
+    result.fold(
+      (failure) => state = state.copyWith(
+        status: RequestStatus.failure,
+        errorMessage: failure.message,
+      ),
+      (user) {
+        state = state.copyWith(status: RequestStatus.success, user: user);
+        ref.read(sessionControllerProvider.notifier).setUser(user);
+      },
+    );
+  }
+
+  Future<void> signUpWithEmail({
+    required String name,
+    required String email,
+    required String password,
+  }) async {
+    state = state.copyWith(status: RequestStatus.loading, errorMessage: null);
+    final result = await _signUpWithEmail(
+      EmailAuthParams(email: email, password: password, name: name),
+    );
+    result.fold(
+      (failure) => state = state.copyWith(
+        status: RequestStatus.failure,
+        errorMessage: failure.message,
+      ),
+      (user) {
+        state = state.copyWith(status: RequestStatus.success, user: user);
+        ref.read(sessionControllerProvider.notifier).setUser(user);
+      },
     );
   }
 }

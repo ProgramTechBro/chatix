@@ -1,8 +1,8 @@
 import 'package:dartz/dartz.dart';
 import 'package:injectable/injectable.dart';
 import '../../../../core/errors/failures.dart';
-import '../../data/repo/comments_repository.dart';
 import '../entities/comment_entity.dart';
+import '../repositories/comments_repository.dart';
 
 @injectable
 class GetPostCommentsUseCase {
@@ -10,5 +10,6 @@ class GetPostCommentsUseCase {
 
   final CommentsRepository _repository;
 
-  Future<Either<Failure, List<CommentEntity>>> call(String postId) => _repository.getComments(postId);
+  Future<Either<Failure, List<CommentEntity>>> call(String postId) =>
+      _repository.getComments(postId);
 }

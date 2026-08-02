@@ -9,36 +9,76 @@
 // coverage:ignore-file
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'package:chatix/features/auth/data/repo/auth_repository.dart' as _i154;
-import 'package:chatix/features/auth/data/repo_impl/auth_repository_impl.dart'
-    as _i526;
-import 'package:chatix/features/auth/domain/usecases/send_otp_usecase.dart'
-    as _i544;
-import 'package:chatix/features/auth/domain/usecases/verify_otp_usecase.dart'
-    as _i943;
-import 'package:chatix/features/chat/data/datasources/local/chat_local_datasource.dart'
-    as _i430;
-import 'package:chatix/features/chat/data/repo/chat_repository.dart' as _i1007;
-import 'package:chatix/features/chat/data/repo_impl/chat_repository_impl.dart'
-    as _i782;
+import 'package:chatix/core/backend/firebase_client.dart' as _i394;
+import 'package:chatix/core/backend/supabase_client.dart' as _i449;
+import 'package:chatix/core/services/local_storage_service.dart' as _i1023;
+import 'package:chatix/core/services/logger_service.dart' as _i399;
+import 'package:chatix/core/services/permission_service.dart' as _i763;
+import 'package:chatix/core/services/push_notification_service.dart' as _i66;
+import 'package:chatix/features/auth/data/datasources/remote/firebase_phone_auth_remote_datasource.dart'
+    as _i698;
+import 'package:chatix/features/auth/data/datasources/remote/firebase_phone_auth_remote_datasource_impl.dart'
+    as _i163;
+import 'package:chatix/features/auth/data/datasources/remote/supabase_auth_remote_datasource.dart'
+    as _i290;
+import 'package:chatix/features/auth/data/datasources/remote/supabase_auth_remote_datasource_impl.dart'
+    as _i659;
+import 'package:chatix/features/auth/data/repositories/auth_repository_impl.dart'
+    as _i28;
+import 'package:chatix/features/auth/domain/repositories/auth_repository.dart'
+    as _i31;
+import 'package:chatix/features/auth/domain/usecases/confirm_phone_otp_usecase.dart'
+    as _i295;
+import 'package:chatix/features/auth/domain/usecases/restore_session_usecase.dart'
+    as _i959;
+import 'package:chatix/features/auth/domain/usecases/set_offline_usecase.dart'
+    as _i13;
+import 'package:chatix/features/auth/domain/usecases/sign_in_with_email_usecase.dart'
+    as _i974;
+import 'package:chatix/features/auth/domain/usecases/sign_out_usecase.dart'
+    as _i525;
+import 'package:chatix/features/auth/domain/usecases/sign_up_with_email_usecase.dart'
+    as _i824;
+import 'package:chatix/features/auth/domain/usecases/update_last_seen_usecase.dart'
+    as _i30;
+import 'package:chatix/features/auth/domain/usecases/verify_phone_number_usecase.dart'
+    as _i906;
+import 'package:chatix/features/chat/data/datasources/remote/chat_remote_datasource.dart'
+    as _i654;
+import 'package:chatix/features/chat/data/datasources/remote/chat_remote_datasource_impl.dart'
+    as _i975;
+import 'package:chatix/features/chat/data/repositories/chat_repository_impl.dart'
+    as _i1056;
+import 'package:chatix/features/chat/domain/repositories/chat_repository.dart'
+    as _i930;
+import 'package:chatix/features/chat/domain/usecases/get_conversation_header_usecase.dart'
+    as _i98;
+import 'package:chatix/features/chat/domain/usecases/mark_conversation_read_usecase.dart'
+    as _i166;
+import 'package:chatix/features/chat/domain/usecases/send_image_message_usecase.dart'
+    as _i785;
 import 'package:chatix/features/chat/domain/usecases/send_message_usecase.dart'
     as _i994;
 import 'package:chatix/features/chat/domain/usecases/watch_messages_usecase.dart'
     as _i642;
-import 'package:chatix/features/chat_list/data/datasources/local/chat_list_local_datasource.dart'
-    as _i110;
-import 'package:chatix/features/chat_list/data/repo/chat_list_repository.dart'
-    as _i504;
-import 'package:chatix/features/chat_list/data/repo_impl/chat_list_repository_impl.dart'
-    as _i959;
-import 'package:chatix/features/chat_list/domain/usecases/get_chat_list_usecase.dart'
-    as _i816;
+import 'package:chatix/features/chat_list/data/datasources/remote/chat_list_remote_datasource.dart'
+    as _i480;
+import 'package:chatix/features/chat_list/data/datasources/remote/chat_list_remote_datasource_impl.dart'
+    as _i495;
+import 'package:chatix/features/chat_list/data/repositories/chat_list_repository_impl.dart'
+    as _i870;
+import 'package:chatix/features/chat_list/domain/repositories/chat_list_repository.dart'
+    as _i20;
+import 'package:chatix/features/chat_list/domain/usecases/get_or_create_conversation_usecase.dart'
+    as _i205;
+import 'package:chatix/features/chat_list/domain/usecases/watch_chat_list_usecase.dart'
+    as _i705;
 import 'package:chatix/features/connections/data/datasources/local/connections_local_datasource.dart'
     as _i974;
-import 'package:chatix/features/connections/data/repo/connections_repository.dart'
-    as _i916;
-import 'package:chatix/features/connections/data/repo_impl/connections_repository_impl.dart'
-    as _i152;
+import 'package:chatix/features/connections/data/repositories/connections_repository_impl.dart'
+    as _i860;
+import 'package:chatix/features/connections/domain/repositories/connections_repository.dart'
+    as _i446;
 import 'package:chatix/features/connections/domain/usecases/get_followers_usecase.dart'
     as _i248;
 import 'package:chatix/features/connections/domain/usecases/get_following_usecase.dart'
@@ -51,20 +91,22 @@ import 'package:chatix/features/home/data/datasources/local/report_local_datasou
     as _i187;
 import 'package:chatix/features/home/data/datasources/local/share_contacts_local_datasource.dart'
     as _i2;
-import 'package:chatix/features/home/data/repo/comments_repository.dart'
-    as _i903;
-import 'package:chatix/features/home/data/repo/feed_repository.dart' as _i217;
-import 'package:chatix/features/home/data/repo/report_repository.dart' as _i321;
-import 'package:chatix/features/home/data/repo/share_contacts_repository.dart'
-    as _i156;
-import 'package:chatix/features/home/data/repo_impl/comments_repository_impl.dart'
-    as _i6;
-import 'package:chatix/features/home/data/repo_impl/feed_repository_impl.dart'
-    as _i244;
-import 'package:chatix/features/home/data/repo_impl/report_repository_impl.dart'
-    as _i519;
-import 'package:chatix/features/home/data/repo_impl/share_contacts_repository_impl.dart'
-    as _i260;
+import 'package:chatix/features/home/data/repositories/comments_repository_impl.dart'
+    as _i1025;
+import 'package:chatix/features/home/data/repositories/feed_repository_impl.dart'
+    as _i622;
+import 'package:chatix/features/home/data/repositories/report_repository_impl.dart'
+    as _i825;
+import 'package:chatix/features/home/data/repositories/share_contacts_repository_impl.dart'
+    as _i26;
+import 'package:chatix/features/home/domain/repositories/comments_repository.dart'
+    as _i1054;
+import 'package:chatix/features/home/domain/repositories/feed_repository.dart'
+    as _i100;
+import 'package:chatix/features/home/domain/repositories/report_repository.dart'
+    as _i462;
+import 'package:chatix/features/home/domain/repositories/share_contacts_repository.dart'
+    as _i376;
 import 'package:chatix/features/home/domain/usecases/get_feed_posts_usecase.dart'
     as _i738;
 import 'package:chatix/features/home/domain/usecases/get_post_comments_usecase.dart'
@@ -75,20 +117,24 @@ import 'package:chatix/features/home/domain/usecases/submit_post_report_usecase.
     as _i146;
 import 'package:chatix/features/home/domain/usecases/toggle_like_post_usecase.dart'
     as _i802;
+import 'package:chatix/features/notifications/data/datasources/fcm_token_datasource.dart'
+    as _i954;
 import 'package:chatix/features/notifications/data/datasources/local/notifications_local_datasource.dart'
     as _i580;
-import 'package:chatix/features/notifications/data/repo/notifications_repository.dart'
-    as _i224;
-import 'package:chatix/features/notifications/data/repo_impl/notifications_repository_impl.dart'
-    as _i874;
+import 'package:chatix/features/notifications/data/repositories/notifications_repository_impl.dart'
+    as _i124;
+import 'package:chatix/features/notifications/domain/repositories/notifications_repository.dart'
+    as _i777;
 import 'package:chatix/features/notifications/domain/usecases/get_notifications_usecase.dart'
     as _i653;
+import 'package:chatix/features/notifications/domain/usecases/save_device_token_usecase.dart'
+    as _i1024;
 import 'package:chatix/features/profile/data/datasources/local/profile_local_datasource.dart'
     as _i508;
-import 'package:chatix/features/profile/data/repo/profile_repository.dart'
-    as _i129;
-import 'package:chatix/features/profile/data/repo_impl/profile_repository_impl.dart'
-    as _i782;
+import 'package:chatix/features/profile/data/repositories/profile_repository_impl.dart'
+    as _i1030;
+import 'package:chatix/features/profile/domain/repositories/profile_repository.dart'
+    as _i367;
 import 'package:chatix/features/profile/domain/usecases/get_profile_photos_usecase.dart'
     as _i397;
 import 'package:chatix/features/profile/domain/usecases/get_profile_posts_usecase.dart'
@@ -97,10 +143,12 @@ import 'package:chatix/features/profile/domain/usecases/get_profile_usecase.dart
     as _i653;
 import 'package:chatix/features/search/data/datasources/local/search_local_datasource.dart'
     as _i562;
-import 'package:chatix/features/search/data/repo/search_repository.dart'
-    as _i736;
-import 'package:chatix/features/search/data/repo_impl/search_repository_impl.dart'
-    as _i672;
+import 'package:chatix/features/search/data/datasources/remote/search_remote_datasource.dart'
+    as _i41;
+import 'package:chatix/features/search/data/repositories/search_repository_impl.dart'
+    as _i860;
+import 'package:chatix/features/search/domain/repositories/search_repository.dart'
+    as _i733;
 import 'package:chatix/features/search/domain/usecases/get_recent_searches_usecase.dart'
     as _i474;
 import 'package:chatix/features/search/domain/usecases/remove_recent_search_usecase.dart'
@@ -109,14 +157,16 @@ import 'package:chatix/features/search/domain/usecases/search_users_usecase.dart
     as _i949;
 import 'package:chatix/features/videos/data/datasources/local/videos_local_datasource.dart'
     as _i164;
-import 'package:chatix/features/videos/data/repo/videos_repository.dart'
-    as _i276;
-import 'package:chatix/features/videos/data/repo_impl/videos_repository_impl.dart'
-    as _i75;
+import 'package:chatix/features/videos/data/repositories/videos_repository_impl.dart'
+    as _i309;
+import 'package:chatix/features/videos/domain/repositories/videos_repository.dart'
+    as _i132;
 import 'package:chatix/features/videos/domain/usecases/get_videos_usecase.dart'
     as _i262;
+import 'package:firebase_auth/firebase_auth.dart' as _i59;
 import 'package:get_it/get_it.dart' as _i174;
 import 'package:injectable/injectable.dart' as _i526;
+import 'package:supabase_flutter/supabase_flutter.dart' as _i454;
 
 extension GetItInjectableX on _i174.GetIt {
   // initializes the registration of main-scope dependencies inside of GetIt
@@ -125,8 +175,21 @@ extension GetItInjectableX on _i174.GetIt {
     _i526.EnvironmentFilter? environmentFilter,
   }) {
     final gh = _i526.GetItHelper(this, environment, environmentFilter);
-    gh.lazySingleton<_i430.ChatLocalDataSource>(
-      () => _i430.ChatLocalDataSourceImpl(),
+    final firebaseClientModule = _$FirebaseClientModule();
+    final supabaseClientModule = _$SupabaseClientModule();
+    gh.lazySingleton<_i59.FirebaseAuth>(
+      () => firebaseClientModule.firebaseAuth,
+    );
+    gh.lazySingleton<_i454.SupabaseClient>(
+      () => supabaseClientModule.supabaseClient,
+    );
+    gh.lazySingleton<_i1023.LocalStorageService>(
+      () => _i1023.LocalStorageService(),
+    );
+    gh.lazySingleton<_i399.LoggerService>(() => _i399.LoggerService());
+    gh.lazySingleton<_i763.PermissionService>(() => _i763.PermissionService());
+    gh.lazySingleton<_i66.PushNotificationService>(
+      () => _i66.PushNotificationService(),
     );
     gh.lazySingleton<_i580.NotificationsLocalDataSource>(
       () => _i580.NotificationsLocalDataSourceImpl(),
@@ -140,12 +203,6 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i508.ProfileLocalDataSource>(
       () => _i508.ProfileLocalDataSourceImpl(),
     );
-    gh.lazySingleton<_i110.ChatListLocalDataSource>(
-      () => _i110.ChatListLocalDataSourceImpl(),
-    );
-    gh.lazySingleton<_i504.ChatListRepository>(
-      () => _i959.ChatListRepositoryImpl(gh<_i110.ChatListLocalDataSource>()),
-    );
     gh.lazySingleton<_i562.SearchLocalDataSource>(
       () => _i562.SearchLocalDataSourceImpl(),
     );
@@ -158,106 +215,172 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i958.CommentsLocalDataSource>(
       () => _i958.CommentsLocalDataSourceImpl(),
     );
-    gh.factory<_i816.GetChatListUseCase>(
-      () => _i816.GetChatListUseCase(gh<_i504.ChatListRepository>()),
-    );
-    gh.lazySingleton<_i156.ShareContactsRepository>(
-      () => _i260.ShareContactsRepositoryImpl(
-        gh<_i2.ShareContactsLocalDataSource>(),
-      ),
-    );
-    gh.lazySingleton<_i154.AuthRepository>(() => _i526.AuthRepositoryImpl());
     gh.lazySingleton<_i164.VideosLocalDataSource>(
       () => _i164.VideosLocalDataSourceImpl(),
     );
-    gh.lazySingleton<_i276.VideosRepository>(
-      () => _i75.VideosRepositoryImpl(gh<_i164.VideosLocalDataSource>()),
+    gh.lazySingleton<_i41.SearchRemoteDataSource>(
+      () => _i41.SearchRemoteDataSourceImpl(gh<_i454.SupabaseClient>()),
     );
-    gh.lazySingleton<_i1007.ChatRepository>(
-      () => _i782.ChatRepositoryImpl(gh<_i430.ChatLocalDataSource>()),
+    gh.lazySingleton<_i367.ProfileRepository>(
+      () => _i1030.ProfileRepositoryImpl(gh<_i508.ProfileLocalDataSource>()),
     );
-    gh.lazySingleton<_i321.ReportRepository>(
-      () => _i519.ReportRepositoryImpl(gh<_i187.ReportLocalDataSource>()),
+    gh.lazySingleton<_i1054.CommentsRepository>(
+      () => _i1025.CommentsRepositoryImpl(gh<_i958.CommentsLocalDataSource>()),
     );
-    gh.lazySingleton<_i224.NotificationsRepository>(
-      () => _i874.NotificationsRepositoryImpl(
-        gh<_i580.NotificationsLocalDataSource>(),
-      ),
+    gh.lazySingleton<_i462.ReportRepository>(
+      () => _i825.ReportRepositoryImpl(gh<_i187.ReportLocalDataSource>()),
     );
-    gh.lazySingleton<_i903.CommentsRepository>(
-      () => _i6.CommentsRepositoryImpl(gh<_i958.CommentsLocalDataSource>()),
+    gh.lazySingleton<_i733.SearchRepository>(
+      () => _i860.SearchRepositoryImpl(gh<_i41.SearchRemoteDataSource>()),
     );
-    gh.lazySingleton<_i217.FeedRepository>(
-      () => _i244.FeedRepositoryImpl(gh<_i400.FeedLocalDataSource>()),
+    gh.lazySingleton<_i290.SupabaseAuthRemoteDataSource>(
+      () => _i659.SupabaseAuthRemoteDataSourceImpl(gh<_i454.SupabaseClient>()),
     );
-    gh.factory<_i994.SendMessageUseCase>(
-      () => _i994.SendMessageUseCase(gh<_i1007.ChatRepository>()),
+    gh.lazySingleton<_i654.ChatRemoteDataSource>(
+      () => _i975.ChatRemoteDataSourceImpl(gh<_i454.SupabaseClient>()),
     );
-    gh.factory<_i642.WatchMessagesUseCase>(
-      () => _i642.WatchMessagesUseCase(gh<_i1007.ChatRepository>()),
+    gh.factory<_i397.GetProfilePhotosUseCase>(
+      () => _i397.GetProfilePhotosUseCase(gh<_i367.ProfileRepository>()),
     );
-    gh.lazySingleton<_i916.ConnectionsRepository>(
-      () => _i152.ConnectionsRepositoryImpl(
+    gh.factory<_i716.GetProfilePostsUseCase>(
+      () => _i716.GetProfilePostsUseCase(gh<_i367.ProfileRepository>()),
+    );
+    gh.factory<_i653.GetProfileUseCase>(
+      () => _i653.GetProfileUseCase(gh<_i367.ProfileRepository>()),
+    );
+    gh.lazySingleton<_i480.ChatListRemoteDataSource>(
+      () => _i495.ChatListRemoteDataSourceImpl(gh<_i454.SupabaseClient>()),
+    );
+    gh.lazySingleton<_i100.FeedRepository>(
+      () => _i622.FeedRepositoryImpl(gh<_i400.FeedLocalDataSource>()),
+    );
+    gh.lazySingleton<_i132.VideosRepository>(
+      () => _i309.VideosRepositoryImpl(gh<_i164.VideosLocalDataSource>()),
+    );
+    gh.lazySingleton<_i698.FirebasePhoneAuthRemoteDataSource>(
+      () =>
+          _i163.FirebasePhoneAuthRemoteDataSourceImpl(gh<_i59.FirebaseAuth>()),
+    );
+    gh.lazySingleton<_i446.ConnectionsRepository>(
+      () => _i860.ConnectionsRepositoryImpl(
         gh<_i974.ConnectionsLocalDataSource>(),
       ),
     );
-    gh.factory<_i262.GetVideosUseCase>(
-      () => _i262.GetVideosUseCase(gh<_i276.VideosRepository>()),
+    gh.lazySingleton<_i930.ChatRepository>(
+      () => _i1056.ChatRepositoryImpl(gh<_i654.ChatRemoteDataSource>()),
     );
-    gh.lazySingleton<_i129.ProfileRepository>(
-      () => _i782.ProfileRepositoryImpl(gh<_i508.ProfileLocalDataSource>()),
+    gh.lazySingleton<_i954.FcmTokenDataSource>(
+      () => _i954.FcmTokenDataSourceImpl(gh<_i454.SupabaseClient>()),
     );
-    gh.factory<_i544.SendOtpUseCase>(
-      () => _i544.SendOtpUseCase(gh<_i154.AuthRepository>()),
+    gh.lazySingleton<_i376.ShareContactsRepository>(
+      () => _i26.ShareContactsRepositoryImpl(
+        gh<_i2.ShareContactsLocalDataSource>(),
+      ),
     );
-    gh.factory<_i943.VerifyOtpUseCase>(
-      () => _i943.VerifyOtpUseCase(gh<_i154.AuthRepository>()),
+    gh.factory<_i98.GetConversationHeaderUseCase>(
+      () => _i98.GetConversationHeaderUseCase(gh<_i930.ChatRepository>()),
     );
-    gh.lazySingleton<_i736.SearchRepository>(
-      () => _i672.SearchRepositoryImpl(gh<_i562.SearchLocalDataSource>()),
+    gh.factory<_i166.MarkConversationReadUseCase>(
+      () => _i166.MarkConversationReadUseCase(gh<_i930.ChatRepository>()),
     );
-    gh.factory<_i480.GetPostCommentsUseCase>(
-      () => _i480.GetPostCommentsUseCase(gh<_i903.CommentsRepository>()),
+    gh.factory<_i785.SendImageMessageUseCase>(
+      () => _i785.SendImageMessageUseCase(gh<_i930.ChatRepository>()),
     );
-    gh.factory<_i397.GetProfilePhotosUseCase>(
-      () => _i397.GetProfilePhotosUseCase(gh<_i129.ProfileRepository>()),
+    gh.factory<_i994.SendMessageUseCase>(
+      () => _i994.SendMessageUseCase(gh<_i930.ChatRepository>()),
     );
-    gh.factory<_i716.GetProfilePostsUseCase>(
-      () => _i716.GetProfilePostsUseCase(gh<_i129.ProfileRepository>()),
-    );
-    gh.factory<_i653.GetProfileUseCase>(
-      () => _i653.GetProfileUseCase(gh<_i129.ProfileRepository>()),
-    );
-    gh.factory<_i474.GetRecentSearchesUseCase>(
-      () => _i474.GetRecentSearchesUseCase(gh<_i736.SearchRepository>()),
-    );
-    gh.factory<_i361.RemoveRecentSearchUseCase>(
-      () => _i361.RemoveRecentSearchUseCase(gh<_i736.SearchRepository>()),
-    );
-    gh.factory<_i949.SearchUsersUseCase>(
-      () => _i949.SearchUsersUseCase(gh<_i736.SearchRepository>()),
+    gh.factory<_i642.WatchMessagesUseCase>(
+      () => _i642.WatchMessagesUseCase(gh<_i930.ChatRepository>()),
     );
     gh.factory<_i248.GetFollowersUseCase>(
-      () => _i248.GetFollowersUseCase(gh<_i916.ConnectionsRepository>()),
+      () => _i248.GetFollowersUseCase(gh<_i446.ConnectionsRepository>()),
     );
     gh.factory<_i1061.GetFollowingUseCase>(
-      () => _i1061.GetFollowingUseCase(gh<_i916.ConnectionsRepository>()),
+      () => _i1061.GetFollowingUseCase(gh<_i446.ConnectionsRepository>()),
     );
     gh.factory<_i999.GetShareContactsUseCase>(
-      () => _i999.GetShareContactsUseCase(gh<_i156.ShareContactsRepository>()),
+      () => _i999.GetShareContactsUseCase(gh<_i376.ShareContactsRepository>()),
     );
-    gh.factory<_i653.GetNotificationsUseCase>(
-      () => _i653.GetNotificationsUseCase(gh<_i224.NotificationsRepository>()),
-    );
-    gh.factory<_i146.SubmitPostReportUseCase>(
-      () => _i146.SubmitPostReportUseCase(gh<_i321.ReportRepository>()),
+    gh.lazySingleton<_i31.AuthRepository>(
+      () => _i28.AuthRepositoryImpl(
+        gh<_i290.SupabaseAuthRemoteDataSource>(),
+        gh<_i698.FirebasePhoneAuthRemoteDataSource>(),
+        gh<_i399.LoggerService>(),
+      ),
     );
     gh.factory<_i738.GetFeedPostsUseCase>(
-      () => _i738.GetFeedPostsUseCase(gh<_i217.FeedRepository>()),
+      () => _i738.GetFeedPostsUseCase(gh<_i100.FeedRepository>()),
     );
     gh.factory<_i802.ToggleLikePostUseCase>(
-      () => _i802.ToggleLikePostUseCase(gh<_i217.FeedRepository>()),
+      () => _i802.ToggleLikePostUseCase(gh<_i100.FeedRepository>()),
+    );
+    gh.lazySingleton<_i777.NotificationsRepository>(
+      () => _i124.NotificationsRepositoryImpl(
+        gh<_i580.NotificationsLocalDataSource>(),
+        gh<_i954.FcmTokenDataSource>(),
+      ),
+    );
+    gh.factory<_i474.GetRecentSearchesUseCase>(
+      () => _i474.GetRecentSearchesUseCase(gh<_i733.SearchRepository>()),
+    );
+    gh.factory<_i361.RemoveRecentSearchUseCase>(
+      () => _i361.RemoveRecentSearchUseCase(gh<_i733.SearchRepository>()),
+    );
+    gh.factory<_i949.SearchUsersUseCase>(
+      () => _i949.SearchUsersUseCase(gh<_i733.SearchRepository>()),
+    );
+    gh.lazySingleton<_i20.ChatListRepository>(
+      () => _i870.ChatListRepositoryImpl(gh<_i480.ChatListRemoteDataSource>()),
+    );
+    gh.factory<_i262.GetVideosUseCase>(
+      () => _i262.GetVideosUseCase(gh<_i132.VideosRepository>()),
+    );
+    gh.factory<_i653.GetNotificationsUseCase>(
+      () => _i653.GetNotificationsUseCase(gh<_i777.NotificationsRepository>()),
+    );
+    gh.factory<_i1024.SaveDeviceTokenUseCase>(
+      () => _i1024.SaveDeviceTokenUseCase(gh<_i777.NotificationsRepository>()),
+    );
+    gh.factory<_i480.GetPostCommentsUseCase>(
+      () => _i480.GetPostCommentsUseCase(gh<_i1054.CommentsRepository>()),
+    );
+    gh.factory<_i205.GetOrCreateConversationUseCase>(
+      () => _i205.GetOrCreateConversationUseCase(gh<_i20.ChatListRepository>()),
+    );
+    gh.factory<_i705.WatchChatListUseCase>(
+      () => _i705.WatchChatListUseCase(gh<_i20.ChatListRepository>()),
+    );
+    gh.factory<_i146.SubmitPostReportUseCase>(
+      () => _i146.SubmitPostReportUseCase(gh<_i462.ReportRepository>()),
+    );
+    gh.factory<_i959.RestoreSessionUseCase>(
+      () => _i959.RestoreSessionUseCase(gh<_i31.AuthRepository>()),
+    );
+    gh.factory<_i13.SetOfflineUseCase>(
+      () => _i13.SetOfflineUseCase(gh<_i31.AuthRepository>()),
+    );
+    gh.factory<_i974.SignInWithEmailUseCase>(
+      () => _i974.SignInWithEmailUseCase(gh<_i31.AuthRepository>()),
+    );
+    gh.factory<_i525.SignOutUseCase>(
+      () => _i525.SignOutUseCase(gh<_i31.AuthRepository>()),
+    );
+    gh.factory<_i824.SignUpWithEmailUseCase>(
+      () => _i824.SignUpWithEmailUseCase(gh<_i31.AuthRepository>()),
+    );
+    gh.factory<_i30.UpdateLastSeenUseCase>(
+      () => _i30.UpdateLastSeenUseCase(gh<_i31.AuthRepository>()),
+    );
+    gh.factory<_i295.ConfirmPhoneOtpUseCase>(
+      () => _i295.ConfirmPhoneOtpUseCase(gh<_i31.AuthRepository>()),
+    );
+    gh.factory<_i906.VerifyPhoneNumberUseCase>(
+      () => _i906.VerifyPhoneNumberUseCase(gh<_i31.AuthRepository>()),
     );
     return this;
   }
 }
+
+class _$FirebaseClientModule extends _i394.FirebaseClientModule {}
+
+class _$SupabaseClientModule extends _i449.SupabaseClientModule {}

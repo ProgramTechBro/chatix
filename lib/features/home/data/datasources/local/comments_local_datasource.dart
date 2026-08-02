@@ -20,7 +20,8 @@ class CommentsLocalDataSourceImpl implements CommentsLocalDataSource {
           authorName: 'Mike tyson',
           authorAvatarUrl: AppNetworkImages.postAuthorMikeTyson,
           postedAgo: '17h',
-          message: 'That is looking so amazing you know?\nI have also photo like you',
+          message:
+              'That is looking so amazing you know?\nI have also photo like you',
           likeCount: 980000,
         ),
         CommentModel(

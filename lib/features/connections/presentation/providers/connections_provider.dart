@@ -7,7 +7,10 @@ import '../../domain/usecases/get_following_usecase.dart';
 part 'connections_provider.g.dart';
 
 @riverpod
-Future<List<ConnectionEntity>> followingList(FollowingListRef ref, String userId) async {
+Future<List<ConnectionEntity>> followingList(
+  FollowingListRef ref,
+  String userId,
+) async {
   final result = await getIt<GetFollowingUseCase>().call(userId);
   return result.fold(
     (failure) => throw Exception(failure.message),
@@ -16,7 +19,10 @@ Future<List<ConnectionEntity>> followingList(FollowingListRef ref, String userId
 }
 
 @riverpod
-Future<List<ConnectionEntity>> followersList(FollowersListRef ref, String userId) async {
+Future<List<ConnectionEntity>> followersList(
+  FollowersListRef ref,
+  String userId,
+) async {
   final result = await getIt<GetFollowersUseCase>().call(userId);
   return result.fold(
     (failure) => throw Exception(failure.message),

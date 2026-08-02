@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "338505742621",
+    "project_id": "chatix-62e1c",
+    "storage_bucket": "chatix-62e1c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:338505742621:android:0a641e38e5575b6b35c9f4",
+        "android_client_info": {
+          "package_name": "com.example.chatix"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCGzz9aZin0glYTvSmJjpIvsoC9CRx6T2w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

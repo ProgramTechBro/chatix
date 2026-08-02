@@ -18,7 +18,10 @@ Future<ProfileEntity> profile(ProfileRef ref, String userId) async {
 }
 
 @riverpod
-Future<List<PostEntity>> profilePosts(ProfilePostsRef ref, String userId) async {
+Future<List<PostEntity>> profilePosts(
+  ProfilePostsRef ref,
+  String userId,
+) async {
   final result = await getIt<GetProfilePostsUseCase>().call(userId);
   return result.fold(
     (failure) => throw Exception(failure.message),

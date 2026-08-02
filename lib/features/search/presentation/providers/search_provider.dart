@@ -19,11 +19,13 @@ class SearchController extends _$SearchController {
   }
 
   Future<void> search(String query) async {
-    state = const AsyncLoading<List<SearchedUserEntity>>().copyWithPrevious(state);
+    state = const AsyncLoading<List<SearchedUserEntity>>().copyWithPrevious(
+      state,
+    );
     final result = await getIt<SearchUsersUseCase>().call(query);
     state = result.fold(
       (failure) => AsyncError(failure.message, StackTrace.current),
-      (users) => AsyncData(users),
+      AsyncData.new,
     );
   }
 

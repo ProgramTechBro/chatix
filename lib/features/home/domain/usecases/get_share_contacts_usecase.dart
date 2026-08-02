@@ -1,8 +1,8 @@
 import 'package:dartz/dartz.dart';
 import 'package:injectable/injectable.dart';
 import '../../../../core/errors/failures.dart';
-import '../../data/repo/share_contacts_repository.dart';
 import '../entities/share_contact_entity.dart';
+import '../repositories/share_contacts_repository.dart';
 
 @injectable
 class GetShareContactsUseCase {
@@ -10,5 +10,6 @@ class GetShareContactsUseCase {
 
   final ShareContactsRepository _repository;
 
-  Future<Either<Failure, List<ShareContactEntity>>> call() => _repository.getContacts();
+  Future<Either<Failure, List<ShareContactEntity>>> call() =>
+      _repository.getContacts();
 }

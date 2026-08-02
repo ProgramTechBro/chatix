@@ -1,8 +1,8 @@
 import 'package:dartz/dartz.dart';
 import 'package:injectable/injectable.dart';
 import '../../../../core/errors/failures.dart';
-import '../../data/repo/notifications_repository.dart';
 import '../entities/notification_entity.dart';
+import '../repositories/notifications_repository.dart';
 
 @injectable
 class GetNotificationsUseCase {
@@ -10,5 +10,6 @@ class GetNotificationsUseCase {
 
   final NotificationsRepository _repository;
 
-  Future<Either<Failure, List<NotificationEntity>>> call() => _repository.getNotifications();
+  Future<Either<Failure, List<NotificationEntity>>> call() =>
+      _repository.getNotifications();
 }

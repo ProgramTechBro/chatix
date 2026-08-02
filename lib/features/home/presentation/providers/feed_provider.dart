@@ -22,14 +22,11 @@ class FeedController extends _$FeedController {
     if (currentPosts == null) return;
 
     final result = await getIt<ToggleLikePostUseCase>().call(postId);
-    result.fold(
-      (failure) => null,
-      (updatedPost) {
-        state = AsyncData([
-          for (final post in currentPosts)
-            if (post.id == updatedPost.id) updatedPost else post,
-        ]);
-      },
-    );
+    result.fold((failure) => null, (updatedPost) {
+      state = AsyncData([
+        for (final post in currentPosts)
+          if (post.id == updatedPost.id) updatedPost else post,
+      ]);
+    });
   }
 }

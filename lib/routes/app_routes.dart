@@ -13,12 +13,14 @@ class AppRoutes {
   static const String profile = '/profile/:userId';
   static const String videoPlayer = '/video-player';
   static const String createPost = '/create-post';
-  static const String chatDetail = '/chat-detail';
+  static const String chatDetail = '/chat-detail/:conversationId';
   static const String profilePostsFeed = '/profile-posts/:userId';
   static const String profilePostsGrid = '/posts/:userId';
   static const String editProfile = '/edit-profile/:userId';
   static const String following = '/following/:userId';
   static const String followers = '/followers/:userId';
+  static const String phoneVerification = '/phone-verification';
+  static const String otpVerification = '/otp-verification';
 
   static String postDetailPath(String postId) => '/post-detail/$postId';
   static String reportPostPath(String postId) => '/report/$postId';
@@ -28,4 +30,6 @@ class AppRoutes {
   static String editProfilePath(String userId) => '/edit-profile/$userId';
   static String followingPath(String userId) => '/following/$userId';
   static String followersPath(String userId) => '/followers/$userId';
+  static String chatDetailPath(String conversationId) =>
+      '/chat-detail/$conversationId';
 }

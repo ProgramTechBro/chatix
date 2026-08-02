@@ -47,3 +47,4 @@ app.*.map.json
 
 #Keys and Secrets in env
 .env
+*.env
