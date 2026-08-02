@@ -13,7 +13,8 @@ class VideosLocalDataSourceImpl implements VideosLocalDataSource {
     return const [
       VideoModel(
         id: 'v1',
-        videoUrl: 'https://flutter.github.io/assets-for-api-docs/assets/videos/bee.mp4',
+        videoUrl:
+            'https://flutter.github.io/assets-for-api-docs/assets/videos/bee.mp4',
         thumbnailAsset: AppImages.videoThumb1,
         authorName: 'Jerry kovet',
         authorAvatarUrl: AppNetworkImages.contactJohannaWest,
@@ -25,7 +26,8 @@ class VideosLocalDataSourceImpl implements VideosLocalDataSource {
       ),
       VideoModel(
         id: 'v2',
-        videoUrl: 'https://flutter.github.io/assets-for-api-docs/assets/videos/butterfly.mp4',
+        videoUrl:
+            'https://flutter.github.io/assets-for-api-docs/assets/videos/butterfly.mp4',
         thumbnailAsset: AppImages.videoThumb2,
         authorName: 'Johana West',
         authorAvatarUrl: AppNetworkImages.contactJohannaWest,
@@ -37,7 +39,8 @@ class VideosLocalDataSourceImpl implements VideosLocalDataSource {
       ),
       VideoModel(
         id: 'v3',
-        videoUrl: 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
+        videoUrl:
+            'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
         thumbnailAsset: AppImages.videoThumb3,
         authorName: 'Johana West',
         authorAvatarUrl: AppNetworkImages.contactJohannaWest,

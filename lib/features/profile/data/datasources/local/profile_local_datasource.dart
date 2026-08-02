@@ -37,7 +37,8 @@ class ProfileLocalDataSourceImpl implements ProfileLocalDataSource {
         authorAvatarUrl: AppNetworkImages.contactJohannaWest,
         isVerified: false,
         postedAgo: '17h',
-        caption: "I don't care who is doing better than me\nI am doing better than I was...",
+        caption:
+            "I don't care who is doing better than me\nI am doing better than I was...",
         imageAsset: AppImages.feedPost1,
         likeCount: 980000,
         commentCount: 1200000,
@@ -58,7 +59,8 @@ class ProfileLocalDataSourceImpl implements ProfileLocalDataSource {
         shareCount: 1200,
         isLiked: false,
         mediaType: PostMediaType.video,
-        videoUrl: 'https://flutter.github.io/assets-for-api-docs/assets/videos/bee.mp4',
+        videoUrl:
+            'https://flutter.github.io/assets-for-api-docs/assets/videos/bee.mp4',
       ),
       PostModel(
         id: 'p_profile_3',
@@ -88,7 +90,8 @@ class ProfileLocalDataSourceImpl implements ProfileLocalDataSource {
         shareCount: 640,
         isLiked: false,
         mediaType: PostMediaType.video,
-        videoUrl: 'https://flutter.github.io/assets-for-api-docs/assets/videos/butterfly.mp4',
+        videoUrl:
+            'https://flutter.github.io/assets-for-api-docs/assets/videos/butterfly.mp4',
       ),
       PostModel(
         id: 'p_profile_5',
@@ -118,7 +121,8 @@ class ProfileLocalDataSourceImpl implements ProfileLocalDataSource {
         shareCount: 130,
         isLiked: false,
         mediaType: PostMediaType.video,
-        videoUrl: 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
+        videoUrl:
+            'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
       ),
     ];
   }

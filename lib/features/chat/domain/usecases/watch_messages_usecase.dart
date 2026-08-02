@@ -1,6 +1,6 @@
 import 'package:injectable/injectable.dart';
-import '../../data/repo/chat_repository.dart';
 import '../entities/message_entity.dart';
+import '../repositories/chat_repository.dart';
 
 @injectable
 class WatchMessagesUseCase {
@@ -8,5 +8,7 @@ class WatchMessagesUseCase {
 
   final ChatRepository _repository;
 
-  Stream<List<MessageEntity>> call(String chatId) => _repository.watchMessages(chatId);
+  Stream<List<MessageEntity>> call(String conversationId) {
+    return _repository.watchMessages(conversationId);
+  }
 }

@@ -1,7 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:injectable/injectable.dart';
 import '../../../../core/errors/failures.dart';
-import '../../data/repo/search_repository.dart';
+import '../repositories/search_repository.dart';
 
 @injectable
 class RemoveRecentSearchUseCase {
@@ -9,5 +9,6 @@ class RemoveRecentSearchUseCase {
 
   final SearchRepository _repository;
 
-  Future<Either<Failure, void>> call(String userId) => _repository.removeRecentSearch(userId);
+  Future<Either<Failure, void>> call(String userId) =>
+      _repository.removeRecentSearch(userId);
 }

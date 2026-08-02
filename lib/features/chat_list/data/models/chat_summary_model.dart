@@ -7,6 +7,8 @@ class ChatSummaryModel extends ChatSummaryEntity {
     required super.name,
     required super.avatarUrl,
     required super.lastMessage,
-    required super.time,
+    required super.lastMessageAt,
+    required super.isOnline,
+    required super.unreadCount,
   });
 }

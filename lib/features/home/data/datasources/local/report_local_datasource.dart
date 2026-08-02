@@ -7,7 +7,10 @@ abstract class ReportLocalDataSource {
 @LazySingleton(as: ReportLocalDataSource)
 class ReportLocalDataSourceImpl implements ReportLocalDataSource {
   @override
-  Future<void> submitReport({required String postId, required String reason}) async {
+  Future<void> submitReport({
+    required String postId,
+    required String reason,
+  }) async {
     await Future.delayed(const Duration(milliseconds: 500));
   }
 }

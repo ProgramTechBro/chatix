@@ -17,7 +17,8 @@ class FeedLocalDataSourceImpl implements FeedLocalDataSource {
       authorAvatarUrl: AppNetworkImages.postAuthorMikeTyson,
       isVerified: true,
       postedAgo: '17h',
-      caption: "I don't care who is doing better than me\nI am doing better than I was...",
+      caption:
+          "I don't care who is doing better than me\nI am doing better than I was...",
       imageAsset: AppImages.feedPost1,
       likeCount: 980000,
       commentCount: 1200000,
@@ -31,7 +32,8 @@ class FeedLocalDataSourceImpl implements FeedLocalDataSource {
       authorAvatarUrl: AppNetworkImages.postAuthorBitcoin,
       isVerified: true,
       postedAgo: '5d',
-      caption: 'What do think Bitcoin is much worthier?\nno more good time than now...',
+      caption:
+          'What do think Bitcoin is much worthier?\nno more good time than now...',
       imageAsset: AppImages.feedPost2,
       likeCount: 980000,
       commentCount: 1200000,
@@ -56,7 +58,9 @@ class FeedLocalDataSourceImpl implements FeedLocalDataSource {
       postedAgo: current.postedAgo,
       caption: current.caption,
       imageAsset: current.imageAsset,
-      likeCount: current.isLiked ? current.likeCount - 1 : current.likeCount + 1,
+      likeCount: current.isLiked
+          ? current.likeCount - 1
+          : current.likeCount + 1,
       commentCount: current.commentCount,
       shareCount: current.shareCount,
       isLiked: !current.isLiked,

@@ -9,10 +9,26 @@ class AppBackgroundBlobs extends StatelessWidget {
     return const IgnorePointer(
       child: Stack(
         children: [
-          Positioned(top: -90, right: -90, child: _Blob(size: 220, opacity: 0.22)),
-          Positioned(bottom: -110, left: -110, child: _Blob(size: 260, opacity: 0.18)),
-          Positioned(top: 140, left: -50, child: _Blob(size: 100, opacity: 0.16)),
-          Positioned(bottom: 160, right: -30, child: _Blob(size: 80, opacity: 0.16)),
+          Positioned(
+            top: -90,
+            right: -90,
+            child: _Blob(size: 220, opacity: 0.22),
+          ),
+          Positioned(
+            bottom: -110,
+            left: -110,
+            child: _Blob(size: 260, opacity: 0.18),
+          ),
+          Positioned(
+            top: 140,
+            left: -50,
+            child: _Blob(size: 100, opacity: 0.16),
+          ),
+          Positioned(
+            bottom: 160,
+            right: -30,
+            child: _Blob(size: 80, opacity: 0.16),
+          ),
         ],
       ),
     );

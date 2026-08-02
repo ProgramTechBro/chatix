@@ -11,6 +11,7 @@ class AppTextField extends StatefulWidget {
     this.keyboardType,
     this.readOnly = false,
     this.onTap,
+    this.validator,
   });
 
   final String label;
@@ -21,6 +22,7 @@ class AppTextField extends StatefulWidget {
   final TextInputType? keyboardType;
   final bool readOnly;
   final VoidCallback? onTap;
+  final FormFieldValidator<String>? validator;
 
   @override
   State<AppTextField> createState() => _AppTextFieldState();
@@ -40,20 +42,28 @@ class _AppTextFieldState extends State<AppTextField> {
           padding: const EdgeInsets.only(left: 20, bottom: 6),
           child: Text(widget.label.toUpperCase(), style: textTheme.labelSmall),
         ),
-        TextField(
+        TextFormField(
           controller: widget.controller,
           obscureText: _obscured,
           keyboardType: widget.keyboardType,
           readOnly: widget.readOnly,
           onTap: widget.onTap,
-          style: textTheme.labelLarge?.copyWith(color: Theme.of(context).colorScheme.onSurface),
+          validator: widget.validator,
+          autovalidateMode: AutovalidateMode.onUserInteraction,
+          style: textTheme.labelLarge?.copyWith(
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
           decoration: InputDecoration(
             hintText: widget.hint,
-            prefixIcon: widget.prefixIcon != null ? Icon(widget.prefixIcon, size: 20) : null,
+            prefixIcon: widget.prefixIcon != null
+                ? Icon(widget.prefixIcon, size: 20)
+                : null,
             suffixIcon: widget.isPassword
                 ? IconButton(
                     icon: Icon(
-                      _obscured ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                      _obscured
+                          ? Icons.visibility_off_outlined
+                          : Icons.visibility_outlined,
                       size: 20,
                     ),
                     onPressed: () => setState(() => _obscured = !_obscured),

@@ -1,8 +1,8 @@
 import 'package:dartz/dartz.dart';
 import 'package:injectable/injectable.dart';
 import '../../../../core/errors/failures.dart';
-import '../../data/repo/feed_repository.dart';
 import '../entities/post_entity.dart';
+import '../repositories/feed_repository.dart';
 
 @injectable
 class ToggleLikePostUseCase {
@@ -10,5 +10,6 @@ class ToggleLikePostUseCase {
 
   final FeedRepository _repository;
 
-  Future<Either<Failure, PostEntity>> call(String postId) => _repository.toggleLikePost(postId);
+  Future<Either<Failure, PostEntity>> call(String postId) =>
+      _repository.toggleLikePost(postId);
 }

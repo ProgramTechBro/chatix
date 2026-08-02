@@ -5,7 +5,9 @@ class ChatSummaryEntity {
     required this.name,
     required this.avatarUrl,
     required this.lastMessage,
-    required this.time,
+    required this.lastMessageAt,
+    required this.isOnline,
+    required this.unreadCount,
   });
 
   final String id;
@@ -13,5 +15,7 @@ class ChatSummaryEntity {
   final String name;
   final String avatarUrl;
   final String lastMessage;
-  final String time;
+  final DateTime lastMessageAt;
+  final bool isOnline;
+  final int unreadCount;
 }

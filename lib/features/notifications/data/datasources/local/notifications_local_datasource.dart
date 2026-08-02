@@ -15,7 +15,8 @@ class NotificationsLocalDataSourceImpl implements NotificationsLocalDataSource {
         id: 'n1',
         avatarUrl: AppNetworkImages.contactLarryKovet,
         title: 'Larry kovet',
-        message: "Shared your post with ''mr manny, johary bell, sabit musa and 3 others...",
+        message:
+            "Shared your post with ''mr manny, johary bell, sabit musa and 3 others...",
         time: '12:34',
       ),
       NotificationModel(
@@ -36,7 +37,8 @@ class NotificationsLocalDataSourceImpl implements NotificationsLocalDataSource {
         id: 'n4',
         avatarUrl: AppNetworkImages.contactLarryKovet,
         title: 'Larry kovet',
-        message: "Shared your post with ''mr manny, johary bell, sabit musa and 7 others...",
+        message:
+            "Shared your post with ''mr manny, johary bell, sabit musa and 7 others...",
         time: '12:34',
       ),
       NotificationModel(
@@ -50,14 +52,16 @@ class NotificationsLocalDataSourceImpl implements NotificationsLocalDataSource {
         id: 'n6',
         avatarUrl: AppNetworkImages.contactWahidZaman,
         title: 'Wahid Zaman',
-        message: "Commented on your post '' Hey your are just looking so nice and I have a crush on you''...",
+        message:
+            "Commented on your post '' Hey your are just looking so nice and I have a crush on you''...",
         time: '4d',
       ),
       NotificationModel(
         id: 'n7',
         avatarUrl: AppNetworkImages.contactDKarry,
         title: 'You have achieved new gift',
-        message: "Shared your post with ''mr manny, johary bell, sabit musa and 3 others...",
+        message:
+            "Shared your post with ''mr manny, johary bell, sabit musa and 3 others...",
         time: '12:34',
       ),
     ];

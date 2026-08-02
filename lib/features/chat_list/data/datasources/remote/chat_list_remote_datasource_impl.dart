@@ -1,0 +1,131 @@
+import 'dart:async';
+
+import 'package:injectable/injectable.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../models/chat_summary_model.dart';
+import 'chat_list_remote_datasource.dart';
+
+@LazySingleton(as: ChatListRemoteDataSource)
+class ChatListRemoteDataSourceImpl implements ChatListRemoteDataSource {
+  ChatListRemoteDataSourceImpl(this._client);
+
+  final SupabaseClient _client;
+
+  String get _currentUserId => _client.auth.currentUser!.id;
+
+  String _previewFor(Map<String, dynamic> message) {
+    switch (message['type'] as String) {
+      case 'image':
+        return '📷 Photo';
+      case 'voice':
+        return '🎤 Voice message';
+      default:
+        return message['text'] as String? ?? '';
+    }
+  }
+
+  Future<List<ChatSummaryModel>> _fetchChatList() async {
+    final myRows = await _client
+        .from('conversation_participants')
+        .select('conversation_id, unread_count')
+        .eq('user_id', _currentUserId);
+
+    if (myRows.isEmpty) return [];
+
+    final conversationIds = myRows
+        .map((row) => row['conversation_id'] as String)
+        .toList();
+    final unreadByConversation = {
+      for (final row in myRows)
+        row['conversation_id'] as String: row['unread_count'] as int,
+    };
+
+    final otherRows = await _client
+        .from('conversation_participants')
+        .select(
+          'conversation_id, user_id, profiles!inner(name, avatar_url, is_online)',
+        )
+        .inFilter('conversation_id', conversationIds)
+        .neq('user_id', _currentUserId);
+
+    final conversationRows = await _client
+        .from('conversations')
+        .select('id, last_message_at')
+        .inFilter('id', conversationIds);
+    final lastMessageAtByConversation = {
+      for (final row in conversationRows)
+        row['id'] as String: DateTime.parse(row['last_message_at'] as String),
+    };
+
+    final previews = await Future.wait(
+      conversationIds.map((id) async {
+        final rows = await _client
+            .from('messages')
+            .select('type, text')
+            .eq('conversation_id', id)
+            .order('created_at', ascending: false)
+            .limit(1);
+        return MapEntry(id, rows.isNotEmpty ? _previewFor(rows.first) : '');
+      }),
+    );
+    final previewByConversation = Map<String, String>.fromEntries(previews);
+
+    final summaries = otherRows.map((row) {
+      final conversationId = row['conversation_id'] as String;
+      final profile = row['profiles'] as Map<String, dynamic>;
+      return ChatSummaryModel(
+        id: conversationId,
+        userId: row['user_id'] as String,
+        name: profile['name'] as String,
+        avatarUrl: profile['avatar_url'] as String? ?? '',
+        lastMessage: previewByConversation[conversationId] ?? '',
+        lastMessageAt:
+            lastMessageAtByConversation[conversationId] ?? DateTime.now(),
+        isOnline: profile['is_online'] as bool? ?? false,
+        unreadCount: unreadByConversation[conversationId] ?? 0,
+      );
+    }).toList();
+
+    summaries.sort((a, b) => b.lastMessageAt.compareTo(a.lastMessageAt));
+    return summaries;
+  }
+
+  @override
+  Stream<List<ChatSummaryModel>> watchChatList() async* {
+    yield await _fetchChatList();
+
+    final controller = StreamController<List<ChatSummaryModel>>();
+    final channel = _client
+        .channel('conversation_participants:$_currentUserId')
+        .onPostgresChanges(
+          event: PostgresChangeEvent.all,
+          schema: 'public',
+          table: 'conversation_participants',
+          filter: PostgresChangeFilter(
+            type: PostgresChangeFilterType.eq,
+            column: 'user_id',
+            value: _currentUserId,
+          ),
+          callback: (payload) async {
+            controller.add(await _fetchChatList());
+          },
+        )
+        .subscribe();
+
+    try {
+      yield* controller.stream;
+    } finally {
+      await _client.removeChannel(channel);
+      await controller.close();
+    }
+  }
+
+  @override
+  Future<String> getOrCreateDirectConversation(String otherUserId) async {
+    final result = await _client.rpc(
+      'get_or_create_direct_conversation',
+      params: {'other_user_id': otherUserId},
+    );
+    return result as String;
+  }
+}

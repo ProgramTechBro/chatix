@@ -2,7 +2,11 @@ import 'package:flutter/material.dart';
 import '../../config/app_colors.dart';
 
 class AppOutlinedButton extends StatelessWidget {
-  const AppOutlinedButton({super.key, required this.label, required this.onPressed});
+  const AppOutlinedButton({
+    super.key,
+    required this.label,
+    required this.onPressed,
+  });
 
   final String label;
   final VoidCallback? onPressed;
@@ -20,7 +24,9 @@ class AppOutlinedButton extends StatelessWidget {
         ),
         child: Text(
           label,
-          style: Theme.of(context).textTheme.labelLarge?.copyWith(color: AppColors.black),
+          style: Theme.of(
+            context,
+          ).textTheme.labelLarge?.copyWith(color: AppColors.black),
         ),
       ),
     );

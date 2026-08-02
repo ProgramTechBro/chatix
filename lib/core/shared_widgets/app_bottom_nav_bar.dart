@@ -4,7 +4,11 @@ import '../../config/app_assets.dart';
 import '../../config/app_colors.dart';
 
 class AppBottomNavBar extends StatelessWidget {
-  const AppBottomNavBar({super.key, required this.selectedIndex, required this.onTap});
+  const AppBottomNavBar({
+    super.key,
+    required this.selectedIndex,
+    required this.onTap,
+  });
 
   final int selectedIndex;
   final ValueChanged<int> onTap;
@@ -64,7 +68,11 @@ class AppBottomNavBar extends StatelessWidget {
 }
 
 class _NavBarButton extends StatelessWidget {
-  const _NavBarButton({required this.data, required this.isSelected, required this.onTap});
+  const _NavBarButton({
+    required this.data,
+    required this.isSelected,
+    required this.onTap,
+  });
 
   final _NavItemData data;
   final bool isSelected;
@@ -89,7 +97,9 @@ class _NavBarButton extends StatelessWidget {
             const SizedBox(height: 4),
             Text(
               data.label,
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: color),
+              style: Theme.of(
+                context,
+              ).textTheme.bodyLarge?.copyWith(color: color),
             ),
           ],
         ),
@@ -99,7 +109,11 @@ class _NavBarButton extends StatelessWidget {
 }
 
 class _NavItemData {
-  const _NavItemData({required this.label, required this.selectedIcon, required this.unselectedIcon});
+  const _NavItemData({
+    required this.label,
+    required this.selectedIcon,
+    required this.unselectedIcon,
+  });
 
   final String label;
   final String selectedIcon;

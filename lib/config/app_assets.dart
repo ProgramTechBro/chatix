@@ -37,7 +37,8 @@ class AppIcons {
   static const String navProfileSelected = '${_base}profile_s.svg';
   static const String navProfileUnselected = '${_base}profile_us.svg';
   static const String navNotificationsSelected = '${_base}notification_s.svg';
-  static const String navNotificationsUnselected = '${_base}notification_us.svg';
+  static const String navNotificationsUnselected =
+      '${_base}notification_us.svg';
   static const String navSettingsSelected = '${_base}setting_s.svg';
   static const String navSettingsUnselected = '${_base}setting_us.svg';
 
