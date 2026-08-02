@@ -6,6 +6,7 @@ import '../../../../config/app_colors.dart';
 import '../../../../core/enums/request_status.dart';
 import '../../../../core/shared_widgets/app_background_blobs.dart';
 import '../../../../core/shared_widgets/app_button.dart';
+import '../../../../core/shared_widgets/app_phone_field.dart';
 import '../../../../core/shared_widgets/app_text_field.dart';
 import '../../../../core/shared_widgets/app_top_bar.dart';
 import '../../../../core/utils/helpers/validators.dart';
@@ -24,20 +25,17 @@ class _PhoneVerificationScreenState
     extends ConsumerState<PhoneVerificationScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
-  final _phoneController = TextEditingController();
+  String _phoneNumber = '';
 
   @override
   void dispose() {
     _nameController.dispose();
-    _phoneController.dispose();
     super.dispose();
   }
 
   void _sendCode() {
     if (!_formKey.currentState!.validate()) return;
-    ref
-        .read(authNotifierProvider.notifier)
-        .verifyPhoneNumber(_phoneController.text.trim());
+    ref.read(authNotifierProvider.notifier).verifyPhoneNumber(_phoneNumber);
   }
 
   @override
@@ -54,7 +52,7 @@ class _PhoneVerificationScreenState
         context.push(
           AppRoutes.otpVerification,
           extra: {
-            'phoneNumber': _phoneController.text.trim(),
+            'phoneNumber': _phoneNumber,
             'name': _nameController.text.trim(),
           },
         );
@@ -107,13 +105,9 @@ class _PhoneVerificationScreenState
                             validator: nameValidator,
                           ),
                           const SizedBox(height: 16),
-                          AppTextField(
+                          AppPhoneField(
                             label: 'Phone number',
-                            hint: '+1 555 000 0000',
-                            prefixIcon: Icons.phone_outlined,
-                            keyboardType: TextInputType.phone,
-                            controller: _phoneController,
-                            validator: phoneValidator,
+                            onChanged: (value) => _phoneNumber = value,
                           ),
                         ],
                       ),
