@@ -19,10 +19,20 @@ class AppAvatar extends StatelessWidget {
     return Stack(
       clipBehavior: Clip.none,
       children: [
-        CircleAvatar(
-          radius: radius,
-          backgroundImage: CachedNetworkImageProvider(imageUrl),
-        ),
+        imageUrl.isEmpty
+            ? CircleAvatar(
+                radius: radius,
+                backgroundColor: AppColors.surface,
+                child: Icon(
+                  Icons.person_rounded,
+                  size: radius,
+                  color: AppColors.textSecondary,
+                ),
+              )
+            : CircleAvatar(
+                radius: radius,
+                backgroundImage: CachedNetworkImageProvider(imageUrl),
+              ),
         if (isOnline == true)
           Positioned(
             right: -1,

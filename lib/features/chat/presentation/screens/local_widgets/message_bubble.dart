@@ -5,6 +5,7 @@ import '../../../../../config/app_colors.dart';
 import '../../../../../core/enums/message_type.dart';
 import '../../../../../core/shared_widgets/app_avatar.dart';
 import '../../../domain/entities/message_entity.dart';
+import 'voice_message_player.dart';
 
 class MessageBubble extends StatelessWidget {
   const MessageBubble({
@@ -96,13 +97,11 @@ class _MessageContent extends StatelessWidget {
           ),
         );
       case MessageType.voice:
-        return Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.graphic_eq_rounded, size: 20, color: textStyle?.color),
-            const SizedBox(width: 8),
-            Text('Voice message', style: textStyle),
-          ],
+        return VoiceMessagePlayer(
+          audioUrl: message.mediaUrl!,
+          totalDuration: Duration(milliseconds: message.mediaDurationMs ?? 0),
+          color: textStyle?.color ?? AppColors.black,
+          textStyle: textStyle,
         );
       case MessageType.text:
         return Text(message.text ?? '', style: textStyle);

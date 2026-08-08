@@ -47,20 +47,34 @@ import 'package:chatix/features/chat/data/datasources/remote/chat_remote_datasou
     as _i654;
 import 'package:chatix/features/chat/data/datasources/remote/chat_remote_datasource_impl.dart'
     as _i975;
+import 'package:chatix/features/chat/data/datasources/remote/typing_remote_datasource.dart'
+    as _i105;
+import 'package:chatix/features/chat/data/datasources/remote/typing_remote_datasource_impl.dart'
+    as _i331;
 import 'package:chatix/features/chat/data/repositories/chat_repository_impl.dart'
     as _i1056;
+import 'package:chatix/features/chat/data/repositories/typing_repository_impl.dart'
+    as _i819;
 import 'package:chatix/features/chat/domain/repositories/chat_repository.dart'
     as _i930;
-import 'package:chatix/features/chat/domain/usecases/get_conversation_header_usecase.dart'
-    as _i98;
+import 'package:chatix/features/chat/domain/repositories/typing_repository.dart'
+    as _i529;
 import 'package:chatix/features/chat/domain/usecases/mark_conversation_read_usecase.dart'
     as _i166;
 import 'package:chatix/features/chat/domain/usecases/send_image_message_usecase.dart'
     as _i785;
 import 'package:chatix/features/chat/domain/usecases/send_message_usecase.dart'
     as _i994;
+import 'package:chatix/features/chat/domain/usecases/send_typing_indicator_usecase.dart'
+    as _i69;
+import 'package:chatix/features/chat/domain/usecases/send_voice_message_usecase.dart'
+    as _i229;
+import 'package:chatix/features/chat/domain/usecases/watch_conversation_header_usecase.dart'
+    as _i504;
 import 'package:chatix/features/chat/domain/usecases/watch_messages_usecase.dart'
     as _i642;
+import 'package:chatix/features/chat/domain/usecases/watch_typing_indicator_usecase.dart'
+    as _i62;
 import 'package:chatix/features/chat_list/data/datasources/remote/chat_list_remote_datasource.dart'
     as _i480;
 import 'package:chatix/features/chat_list/data/datasources/remote/chat_list_remote_datasource_impl.dart'
@@ -269,6 +283,9 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i930.ChatRepository>(
       () => _i1056.ChatRepositoryImpl(gh<_i654.ChatRemoteDataSource>()),
     );
+    gh.lazySingleton<_i105.TypingRemoteDataSource>(
+      () => _i331.TypingRemoteDataSourceImpl(gh<_i454.SupabaseClient>()),
+    );
     gh.lazySingleton<_i954.FcmTokenDataSource>(
       () => _i954.FcmTokenDataSourceImpl(gh<_i454.SupabaseClient>()),
     );
@@ -276,9 +293,6 @@ extension GetItInjectableX on _i174.GetIt {
       () => _i26.ShareContactsRepositoryImpl(
         gh<_i2.ShareContactsLocalDataSource>(),
       ),
-    );
-    gh.factory<_i98.GetConversationHeaderUseCase>(
-      () => _i98.GetConversationHeaderUseCase(gh<_i930.ChatRepository>()),
     );
     gh.factory<_i166.MarkConversationReadUseCase>(
       () => _i166.MarkConversationReadUseCase(gh<_i930.ChatRepository>()),
@@ -289,8 +303,14 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i994.SendMessageUseCase>(
       () => _i994.SendMessageUseCase(gh<_i930.ChatRepository>()),
     );
+    gh.factory<_i229.SendVoiceMessageUseCase>(
+      () => _i229.SendVoiceMessageUseCase(gh<_i930.ChatRepository>()),
+    );
     gh.factory<_i642.WatchMessagesUseCase>(
       () => _i642.WatchMessagesUseCase(gh<_i930.ChatRepository>()),
+    );
+    gh.factory<_i504.WatchConversationHeaderUseCase>(
+      () => _i504.WatchConversationHeaderUseCase(gh<_i930.ChatRepository>()),
     );
     gh.factory<_i248.GetFollowersUseCase>(
       () => _i248.GetFollowersUseCase(gh<_i446.ConnectionsRepository>()),
@@ -350,8 +370,20 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i705.WatchChatListUseCase>(
       () => _i705.WatchChatListUseCase(gh<_i20.ChatListRepository>()),
     );
+    gh.lazySingleton<_i529.TypingRepository>(
+      () => _i819.TypingRepositoryImpl(gh<_i105.TypingRemoteDataSource>()),
+    );
     gh.factory<_i146.SubmitPostReportUseCase>(
       () => _i146.SubmitPostReportUseCase(gh<_i462.ReportRepository>()),
+    );
+    gh.factory<_i69.SendTypingIndicatorUseCase>(
+      () => _i69.SendTypingIndicatorUseCase(gh<_i529.TypingRepository>()),
+    );
+    gh.factory<_i62.WatchTypingIndicatorUseCase>(
+      () => _i62.WatchTypingIndicatorUseCase(gh<_i529.TypingRepository>()),
+    );
+    gh.factory<_i295.ConfirmPhoneOtpUseCase>(
+      () => _i295.ConfirmPhoneOtpUseCase(gh<_i31.AuthRepository>()),
     );
     gh.factory<_i959.RestoreSessionUseCase>(
       () => _i959.RestoreSessionUseCase(gh<_i31.AuthRepository>()),
@@ -370,9 +402,6 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factory<_i30.UpdateLastSeenUseCase>(
       () => _i30.UpdateLastSeenUseCase(gh<_i31.AuthRepository>()),
-    );
-    gh.factory<_i295.ConfirmPhoneOtpUseCase>(
-      () => _i295.ConfirmPhoneOtpUseCase(gh<_i31.AuthRepository>()),
     );
     gh.factory<_i906.VerifyPhoneNumberUseCase>(
       () => _i906.VerifyPhoneNumberUseCase(gh<_i31.AuthRepository>()),

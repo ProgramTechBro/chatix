@@ -80,8 +80,7 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
     return _client.storage.from('chat-media').getPublicUrl(fileName);
   }
 
-  @override
-  Future<ChatHeaderModel> getConversationHeader(String conversationId) async {
+  Future<ChatHeaderModel> _fetchHeader(String conversationId) async {
     final row = await _client
         .from('conversation_participants')
         .select(
@@ -102,6 +101,40 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
           ? DateTime.parse(profile['last_seen_at'] as String)
           : null,
     );
+  }
+
+  @override
+  Stream<ChatHeaderModel> watchConversationHeader(
+    String conversationId,
+  ) async* {
+    var header = await _fetchHeader(conversationId);
+    yield header;
+
+    final controller = StreamController<ChatHeaderModel>();
+    final channel = _client
+        .channel('profile:${header.otherUserId}')
+        .onPostgresChanges(
+          event: PostgresChangeEvent.update,
+          schema: 'public',
+          table: 'profiles',
+          filter: PostgresChangeFilter(
+            type: PostgresChangeFilterType.eq,
+            column: 'id',
+            value: header.otherUserId,
+          ),
+          callback: (payload) async {
+            header = await _fetchHeader(conversationId);
+            controller.add(header);
+          },
+        )
+        .subscribe();
+
+    try {
+      yield* controller.stream;
+    } finally {
+      await _client.removeChannel(channel);
+      await controller.close();
+    }
   }
 
   @override

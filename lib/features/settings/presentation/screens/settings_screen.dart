@@ -30,15 +30,8 @@ class SettingsScreen extends ConsumerWidget {
           children: [
             SizedBox(
               height: 56,
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  Text('Settings', style: textTheme.titleSmall),
-                  const Align(
-                    alignment: Alignment.centerLeft,
-                    child: AppBackButton(),
-                  ),
-                ],
+              child: Center(
+                child: Text('Settings', style: textTheme.titleSmall),
               ),
             ),
             const Padding(

@@ -149,7 +149,7 @@ class _ChatMessagesProviderElement
   String get conversationId => (origin as ChatMessagesProvider).conversationId;
 }
 
-String _$chatHeaderHash() => r'c75a0d9abce878d313a0ad21b6e2fbc2d3284fbf';
+String _$chatHeaderHash() => r'056e006967e5fdc4e2f8cc59ad90e078c6a92933';
 
 /// See also [chatHeader].
 @ProviderFor(chatHeader)
@@ -188,7 +188,7 @@ class ChatHeaderFamily extends Family<AsyncValue<ChatHeaderEntity>> {
 }
 
 /// See also [chatHeader].
-class ChatHeaderProvider extends AutoDisposeFutureProvider<ChatHeaderEntity> {
+class ChatHeaderProvider extends AutoDisposeStreamProvider<ChatHeaderEntity> {
   /// See also [chatHeader].
   ChatHeaderProvider(String conversationId)
     : this._internal(
@@ -217,7 +217,7 @@ class ChatHeaderProvider extends AutoDisposeFutureProvider<ChatHeaderEntity> {
 
   @override
   Override overrideWith(
-    FutureOr<ChatHeaderEntity> Function(ChatHeaderRef provider) create,
+    Stream<ChatHeaderEntity> Function(ChatHeaderRef provider) create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -234,7 +234,7 @@ class ChatHeaderProvider extends AutoDisposeFutureProvider<ChatHeaderEntity> {
   }
 
   @override
-  AutoDisposeFutureProviderElement<ChatHeaderEntity> createElement() {
+  AutoDisposeStreamProviderElement<ChatHeaderEntity> createElement() {
     return _ChatHeaderProviderElement(this);
   }
 
@@ -255,13 +255,13 @@ class ChatHeaderProvider extends AutoDisposeFutureProvider<ChatHeaderEntity> {
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-mixin ChatHeaderRef on AutoDisposeFutureProviderRef<ChatHeaderEntity> {
+mixin ChatHeaderRef on AutoDisposeStreamProviderRef<ChatHeaderEntity> {
   /// The parameter `conversationId` of this provider.
   String get conversationId;
 }
 
 class _ChatHeaderProviderElement
-    extends AutoDisposeFutureProviderElement<ChatHeaderEntity>
+    extends AutoDisposeStreamProviderElement<ChatHeaderEntity>
     with ChatHeaderRef {
   _ChatHeaderProviderElement(super.provider);
 

@@ -52,17 +52,8 @@ class ChatRepositoryImpl implements ChatRepository {
   }
 
   @override
-  Future<Either<Failure, ChatHeaderEntity>> getConversationHeader(
-    String conversationId,
-  ) async {
-    try {
-      final header = await _remoteDataSource.getConversationHeader(
-        conversationId,
-      );
-      return Right(header);
-    } catch (_) {
-      return const Left(ServerFailure('Could not load conversation.'));
-    }
+  Stream<ChatHeaderEntity> watchConversationHeader(String conversationId) {
+    return _remoteDataSource.watchConversationHeader(conversationId);
   }
 
   @override

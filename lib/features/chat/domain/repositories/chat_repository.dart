@@ -16,9 +16,7 @@ abstract class ChatRepository {
     File file,
   );
 
-  Future<Either<Failure, ChatHeaderEntity>> getConversationHeader(
-    String conversationId,
-  );
+  Stream<ChatHeaderEntity> watchConversationHeader(String conversationId);
 
   Future<Either<Failure, void>> markConversationRead(String conversationId);
 }

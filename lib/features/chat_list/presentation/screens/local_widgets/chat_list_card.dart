@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import '../../../../../config/app_colors.dart';
 import '../../../../../core/shared_widgets/app_avatar.dart';
 import '../../../domain/entities/chat_summary_entity.dart';
+import '../chat_summary_presentation_extension.dart';
 
 class ChatListCard extends StatelessWidget {
   const ChatListCard({
@@ -32,7 +33,7 @@ class ChatListCard extends StatelessWidget {
               child: AppAvatar(
                 imageUrl: chat.avatarUrl,
                 radius: 32,
-                isOnline: chat.isOnline,
+                isOnline: chat.isActuallyOnline,
               ),
             ),
           ),
