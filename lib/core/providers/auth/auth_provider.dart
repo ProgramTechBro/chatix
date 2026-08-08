@@ -17,15 +17,20 @@ part 'auth_provider.g.dart';
 @riverpod
 class SessionController extends _$SessionController {
   Timer? _presenceTimer;
+  bool _disposed = false;
 
   @override
   UserEntity? build() {
-    ref.onDispose(() => _presenceTimer?.cancel());
+    ref.onDispose(() {
+      _disposed = true;
+      _presenceTimer?.cancel();
+    });
     return null;
   }
 
   Future<void> restore() async {
     final result = await getIt<RestoreSessionUseCase>().call();
+    if (_disposed) return;
     result.fold((failure) => state = null, (user) {
       state = user;
       if (user != null) {
@@ -44,6 +49,7 @@ class SessionController extends _$SessionController {
   Future<void> signOut() async {
     _stopPresenceHeartbeat();
     await getIt<SignOutUseCase>().call();
+    if (_disposed) return;
     state = null;
   }
 

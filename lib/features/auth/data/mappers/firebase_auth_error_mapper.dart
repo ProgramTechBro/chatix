@@ -1,7 +1,14 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../../../core/errors/failures.dart';
+import '../../../../core/utils/helpers/network_helpers.dart';
 
 AuthFailure mapFirebaseAuthError(Object error) {
+  if (isNetworkError(error)) {
+    return const AuthFailure(
+      'No internet connection. Please check your network and try again.',
+    );
+  }
+
   if (error is! FirebaseAuthException) {
     return const AuthFailure('Something went wrong. Please try again.');
   }

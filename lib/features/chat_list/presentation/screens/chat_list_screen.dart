@@ -64,6 +64,16 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen> {
                   final filtered = chats
                       .where((chat) => chat.name.toLowerCase().contains(_query))
                       .toList();
+                  if (filtered.isEmpty) {
+                    return Center(
+                      child: Text(
+                        'No chats yet',
+                        style: textTheme.bodyMedium?.copyWith(
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                    );
+                  }
                   return ListView.builder(
                     itemCount: filtered.length,
                     itemBuilder: (context, index) {

@@ -23,12 +23,18 @@ class AuthNotifier extends _$AuthNotifier {
   late final SignUpWithEmailUseCase _signUpWithEmail =
       getIt<SignUpWithEmailUseCase>();
 
+  bool _disposed = false;
+
   @override
-  AuthState build() => const AuthState();
+  AuthState build() {
+    ref.onDispose(() => _disposed = true);
+    return const AuthState();
+  }
 
   Future<void> verifyPhoneNumber(String phoneNumber) async {
     state = state.copyWith(status: RequestStatus.loading, errorMessage: null);
     final result = await _verifyPhoneNumber(phoneNumber);
+    if (_disposed) return;
     result.fold(
       (failure) => state = state.copyWith(
         status: RequestStatus.failure,
@@ -58,6 +64,7 @@ class AuthNotifier extends _$AuthNotifier {
         name: name,
       ),
     );
+    if (_disposed) return;
     result.fold(
       (failure) => state = state.copyWith(
         status: RequestStatus.failure,
@@ -75,6 +82,7 @@ class AuthNotifier extends _$AuthNotifier {
     final result = await _signInWithEmail(
       EmailAuthParams(email: email, password: password),
     );
+    if (_disposed) return;
     result.fold(
       (failure) => state = state.copyWith(
         status: RequestStatus.failure,
@@ -96,6 +104,7 @@ class AuthNotifier extends _$AuthNotifier {
     final result = await _signUpWithEmail(
       EmailAuthParams(email: email, password: password, name: name),
     );
+    if (_disposed) return;
     result.fold(
       (failure) => state = state.copyWith(
         status: RequestStatus.failure,
