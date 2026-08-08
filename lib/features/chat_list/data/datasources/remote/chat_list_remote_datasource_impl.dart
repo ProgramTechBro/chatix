@@ -43,7 +43,7 @@ class ChatListRemoteDataSourceImpl implements ChatListRemoteDataSource {
     final otherRows = await _client
         .from('conversation_participants')
         .select(
-          'conversation_id, user_id, profiles!inner(name, avatar_url, is_online)',
+          'conversation_id, user_id, profiles!inner(name, avatar_url, is_online, last_seen_at)',
         )
         .inFilter('conversation_id', conversationIds)
         .neq('user_id', _currentUserId);
@@ -83,6 +83,9 @@ class ChatListRemoteDataSourceImpl implements ChatListRemoteDataSource {
             lastMessageAtByConversation[conversationId] ?? DateTime.now(),
         isOnline: profile['is_online'] as bool? ?? false,
         unreadCount: unreadByConversation[conversationId] ?? 0,
+        lastSeenAt: profile['last_seen_at'] != null
+            ? DateTime.parse(profile['last_seen_at'] as String)
+            : null,
       );
     }).toList();
 
@@ -106,6 +109,14 @@ class ChatListRemoteDataSourceImpl implements ChatListRemoteDataSource {
             column: 'user_id',
             value: _currentUserId,
           ),
+          callback: (payload) async {
+            controller.add(await _fetchChatList());
+          },
+        )
+        .onPostgresChanges(
+          event: PostgresChangeEvent.update,
+          schema: 'public',
+          table: 'profiles',
           callback: (payload) async {
             controller.add(await _fetchChatList());
           },

@@ -146,11 +146,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
               child: Text('Something went wrong', style: textTheme.bodyMedium),
             ),
           ),
-          Positioned(
-            top: MediaQuery.of(context).padding.top,
-            left: 8,
-            child: const AppBackButton(color: AppColors.white),
-          ),
+          // Positioned(
+          //   top: MediaQuery.of(context).padding.top,
+          //   left: 8,
+          //   child: const AppBackButton(color: AppColors.white),
+          // ),
         ],
       ),
     );

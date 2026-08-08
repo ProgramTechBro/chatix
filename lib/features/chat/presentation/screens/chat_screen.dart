@@ -10,7 +10,10 @@ import '../../../../routes/app_routes.dart';
 import '../../domain/usecases/mark_conversation_read_usecase.dart';
 import '../../domain/usecases/send_image_message_usecase.dart';
 import '../../domain/usecases/send_message_usecase.dart';
+import '../../domain/usecases/send_typing_indicator_usecase.dart';
+import '../../domain/usecases/send_voice_message_usecase.dart';
 import '../providers/chat_provider.dart';
+import '../providers/typing_indicator_provider.dart';
 import 'chat_header_presentation_extension.dart';
 import 'local_widgets/chat_app_bar.dart';
 import 'local_widgets/chat_input_bar.dart';
@@ -39,6 +42,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     final messagesAsync = ref.watch(
       chatMessagesProvider(widget.conversationId),
     );
+    final isTyping = ref.watch(typingIndicatorProvider(widget.conversationId));
     final currentUserId = ref.watch(currentUserIdProvider);
     final textTheme = Theme.of(context).textTheme;
 
@@ -53,7 +57,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                 data: (header) => ChatAppBar(
                   name: header.name,
                   avatarUrl: header.avatarUrl,
-                  statusLabel: header.presenceLabel,
+                  statusLabel: isTyping ? 'Typing...' : header.presenceLabel,
                   onAvatarTap: () =>
                       context.push(AppRoutes.profilePath(header.otherUserId)),
                   onCallTap: () {},
@@ -115,6 +119,15 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                 onSendImage: (file) => getIt<SendImageMessageUseCase>().call(
                   conversationId: widget.conversationId,
                   imageFile: file,
+                ),
+                onSendVoice: (file, durationMs) =>
+                    getIt<SendVoiceMessageUseCase>().call(
+                      conversationId: widget.conversationId,
+                      audioFile: file,
+                      durationMs: durationMs,
+                    ),
+                onTyping: () => getIt<SendTypingIndicatorUseCase>().call(
+                  widget.conversationId,
                 ),
               ),
             ),

@@ -65,5 +65,4 @@ class DefaultFirebaseOptions {
     storageBucket: 'chatix-62e1c.firebasestorage.app',
     iosBundleId: 'com.example.chatix',
   );
-
 }

@@ -40,9 +40,11 @@ class _OtpInputFieldState extends State<OtpInputField> {
 
     final code = _controllers.map((controller) => controller.text).join();
     if (code.length == widget.length) {
+      FocusManager.instance.primaryFocus?.unfocus();
       widget.onCompleted(code);
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -58,8 +60,29 @@ class _OtpInputFieldState extends State<OtpInputField> {
             textAlign: TextAlign.center,
             keyboardType: TextInputType.number,
             maxLength: 1,
-            style: Theme.of(context).textTheme.titleMedium,
-            decoration: const InputDecoration(counterText: ''),
+            style: const TextStyle(
+              color: Colors.black,
+              fontSize: 20,
+              fontWeight: FontWeight.w600,
+            ),
+            decoration: InputDecoration(
+              counterText: '',
+              filled: true,
+              fillColor: Colors.white,
+              contentPadding: EdgeInsets.zero,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(28),
+                borderSide: BorderSide(color: Colors.grey.shade300, width: 1.2),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(28),
+                borderSide: BorderSide(color: Colors.grey.shade300, width: 1.2),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(28),
+                borderSide: BorderSide(color: Colors.grey.shade400, width: 1.5),
+              ),
+            ),
             onChanged: (value) => _onChanged(index, value),
           ),
         );

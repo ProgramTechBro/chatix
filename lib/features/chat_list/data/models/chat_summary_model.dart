@@ -10,5 +10,6 @@ class ChatSummaryModel extends ChatSummaryEntity {
     required super.lastMessageAt,
     required super.isOnline,
     required super.unreadCount,
+    super.lastSeenAt,
   });
 }

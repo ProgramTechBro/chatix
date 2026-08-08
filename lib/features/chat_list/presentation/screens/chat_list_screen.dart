@@ -89,7 +89,12 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen> {
                   );
                 },
                 loading: () => const AppLoader(),
-                error: (error, stackTrace) => const AppErrorView(),
+                // error: (error, stackTrace) => const AppErrorView(),
+                error: (error, stackTrace) {
+                  debugPrint('Chat list error: $error');
+                  debugPrint('Chat list stack trace: $stackTrace');
+                  return const AppErrorView();
+                },
               ),
             ),
           ],

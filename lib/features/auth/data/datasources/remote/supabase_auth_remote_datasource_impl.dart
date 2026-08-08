@@ -44,7 +44,7 @@ class SupabaseAuthRemoteDataSourceImpl implements SupabaseAuthRemoteDataSource {
     required String name,
   }) async {
     final result = await _client.functions.invoke(
-      'bridge-phone-auth',
+      'rapid-endpoint',
       body: {
         'phone': phoneNumber,
         'firebaseIdToken': firebaseIdToken,

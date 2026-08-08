@@ -16,7 +16,7 @@ abstract class ChatRemoteDataSource {
 
   Future<String> uploadChatMedia(String conversationId, File file);
 
-  Future<ChatHeaderModel> getConversationHeader(String conversationId);
+  Stream<ChatHeaderModel> watchConversationHeader(String conversationId);
 
   Future<void> markConversationRead(String conversationId);
 }

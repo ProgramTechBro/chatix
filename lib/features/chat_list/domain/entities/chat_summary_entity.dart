@@ -8,6 +8,7 @@ class ChatSummaryEntity {
     required this.lastMessageAt,
     required this.isOnline,
     required this.unreadCount,
+    this.lastSeenAt,
   });
 
   final String id;
@@ -18,4 +19,5 @@ class ChatSummaryEntity {
   final DateTime lastMessageAt;
   final bool isOnline;
   final int unreadCount;
+  final DateTime? lastSeenAt;
 }

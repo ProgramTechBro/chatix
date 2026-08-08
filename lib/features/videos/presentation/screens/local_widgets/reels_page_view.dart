@@ -45,6 +45,10 @@ class _ReelsPageViewState extends ConsumerState<ReelsPageView> {
     super.dispose();
   }
 
+  bool get _isTabActive =>
+      !widget.pauseWhenInactive ||
+      ref.read(bottomNavIndexProvider) == _videosTabIndex;
+
   VideoPlayerController _createController(int index) {
     final controller = VideoPlayerController.networkUrl(
       Uri.parse(widget.videos[index].videoUrl),
@@ -52,7 +56,7 @@ class _ReelsPageViewState extends ConsumerState<ReelsPageView> {
     controller.setLooping(true);
     controller.initialize().then((_) {
       if (!mounted) return;
-      if (index == _currentIndex) {
+      if (index == _currentIndex && _isTabActive) {
         controller.play();
       }
     });
@@ -76,7 +80,7 @@ class _ReelsPageViewState extends ConsumerState<ReelsPageView> {
   void _onPageChanged(int index) {
     _controllers[_currentIndex]?.pause();
     setState(() => _currentIndex = index);
-    _controllers[index]?.play();
+    if (_isTabActive) _controllers[index]?.play();
     _preloadAround(index);
   }
 
