@@ -1,7 +1,14 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../../core/errors/failures.dart';
+import '../../../../core/utils/helpers/network_helpers.dart';
 
 AuthFailure mapSupabaseAuthError(Object error) {
+  if (isNetworkError(error)) {
+    return const AuthFailure(
+      'No internet connection. Please check your network and try again.',
+    );
+  }
+
   if (error is AuthException) {
     final message = error.message.toLowerCase();
     if (message.contains('invalid login credentials')) {

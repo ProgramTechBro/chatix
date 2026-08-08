@@ -19,7 +19,8 @@ class VideosScreen extends ConsumerWidget {
       body: Stack(
         children: [
           videosAsync.when(
-            data: (videos) => ReelsPageView(videos: videos),
+            data: (videos) =>
+                ReelsPageView(videos: videos, pauseWhenInactive: true),
             loading: () => const Center(
               child: CircularProgressIndicator(color: AppColors.white),
             ),

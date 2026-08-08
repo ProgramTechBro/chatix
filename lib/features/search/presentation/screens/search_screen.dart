@@ -47,6 +47,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   @override
   Widget build(BuildContext context) {
     final resultsAsync = ref.watch(searchControllerProvider);
+    final textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
       backgroundColor: AppColors.white,
@@ -78,20 +79,29 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
             ),
             Expanded(
               child: resultsAsync.when(
-                data: (users) => ListView.builder(
-                  padding: const EdgeInsets.only(top: 8),
-                  itemCount: users.length,
-                  itemBuilder: (context, index) {
-                    final user = users[index];
-                    return SearchResultTile(
-                      user: user,
-                      onTap: () => _startChat(user.id),
-                      onRemove: () => ref
-                          .read(searchControllerProvider.notifier)
-                          .removeRecentSearch(user.id),
-                    );
-                  },
-                ),
+                data: (users) => users.isEmpty
+                    ? Center(
+                        child: Text(
+                          'No users found',
+                          style: textTheme.bodyMedium?.copyWith(
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                      )
+                    : ListView.builder(
+                        padding: const EdgeInsets.only(top: 8),
+                        itemCount: users.length,
+                        itemBuilder: (context, index) {
+                          final user = users[index];
+                          return SearchResultTile(
+                            user: user,
+                            onTap: () => _startChat(user.id),
+                            onRemove: () => ref
+                                .read(searchControllerProvider.notifier)
+                                .removeRecentSearch(user.id),
+                          );
+                        },
+                      ),
                 loading: () => const AppLoader(),
                 error: (error, stackTrace) => const AppErrorView(),
               ),

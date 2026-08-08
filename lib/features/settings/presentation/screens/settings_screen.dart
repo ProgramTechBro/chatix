@@ -1,14 +1,26 @@
+import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../config/app_colors.dart';
+import '../../../../core/providers/auth/auth_provider.dart';
 import '../../../../core/shared_widgets/app_back_button.dart';
+import '../../../../routes/app_routes.dart';
 import 'local_widgets/settings_item_data.dart';
 import 'local_widgets/settings_section.dart';
 
-class SettingsScreen extends StatelessWidget {
+class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
 
+  Future<void> _logout(BuildContext context, WidgetRef ref) async {
+    BotToast.showLoading();
+    await ref.read(sessionControllerProvider.notifier).signOut();
+    BotToast.closeAllLoading();
+    if (context.mounted) context.go(AppRoutes.login);
+  }
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
@@ -96,7 +108,7 @@ class SettingsScreen extends StatelessWidget {
                         icon: Icons.logout_rounded,
                         label: 'Log out',
                         isDestructive: true,
-                        onTap: () {},
+                        onTap: () => _logout(context, ref),
                       ),
                       SettingsItemData(
                         icon: Icons.delete_outline_rounded,

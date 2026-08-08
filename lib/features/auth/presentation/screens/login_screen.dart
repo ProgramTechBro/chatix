@@ -47,6 +47,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final textTheme = Theme.of(context).textTheme;
 
     ref.listen(authNotifierProvider, (previous, next) {
+      if (!(ModalRoute.of(context)?.isCurrent ?? true)) return;
       if (next.status == RequestStatus.loading) {
         BotToast.showLoading();
         return;

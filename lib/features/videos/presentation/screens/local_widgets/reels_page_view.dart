@@ -1,19 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:video_player/video_player.dart';
+import '../../../../../core/providers/bottom_nav_provider.dart';
 import '../../../domain/entities/video_entity.dart';
 import 'reel_video_item.dart';
 
-class ReelsPageView extends StatefulWidget {
-  const ReelsPageView({super.key, required this.videos, this.initialIndex = 0});
+class ReelsPageView extends ConsumerStatefulWidget {
+  const ReelsPageView({
+    super.key,
+    required this.videos,
+    this.initialIndex = 0,
+    this.pauseWhenInactive = false,
+  });
 
   final List<VideoEntity> videos;
   final int initialIndex;
+  final bool pauseWhenInactive;
 
   @override
-  State<ReelsPageView> createState() => _ReelsPageViewState();
+  ConsumerState<ReelsPageView> createState() => _ReelsPageViewState();
 }
 
-class _ReelsPageViewState extends State<ReelsPageView> {
+class _ReelsPageViewState extends ConsumerState<ReelsPageView> {
+  static const _videosTabIndex = 1;
+
   late final PageController _pageController = PageController(
     initialPage: widget.initialIndex,
   );
@@ -72,6 +82,18 @@ class _ReelsPageViewState extends State<ReelsPageView> {
 
   @override
   Widget build(BuildContext context) {
+    if (widget.pauseWhenInactive) {
+      ref.listen(bottomNavIndexProvider, (previous, next) {
+        final controller = _controllers[_currentIndex];
+        if (controller == null || !controller.value.isInitialized) return;
+        if (next != _videosTabIndex) {
+          controller.pause();
+        } else {
+          controller.play();
+        }
+      });
+    }
+
     return PageView.builder(
       controller: _pageController,
       scrollDirection: Axis.vertical,
