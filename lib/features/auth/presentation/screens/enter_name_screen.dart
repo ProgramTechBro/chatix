@@ -6,27 +6,34 @@ import '../../../../config/app_colors.dart';
 import '../../../../core/enums/request_status.dart';
 import '../../../../core/shared_widgets/app_background_blobs.dart';
 import '../../../../core/shared_widgets/app_button.dart';
-import '../../../../core/shared_widgets/app_phone_field.dart';
+import '../../../../core/shared_widgets/app_text_field.dart';
 import '../../../../core/shared_widgets/app_top_bar.dart';
+import '../../../../core/utils/helpers/validators.dart';
 import '../../../../routes/app_routes.dart';
 import '../providers/auth_provider.dart';
 
-class PhoneVerificationScreen extends ConsumerStatefulWidget {
-  const PhoneVerificationScreen({super.key});
+class EnterNameScreen extends ConsumerStatefulWidget {
+  const EnterNameScreen({super.key});
 
   @override
-  ConsumerState<PhoneVerificationScreen> createState() =>
-      _PhoneVerificationScreenState();
+  ConsumerState<EnterNameScreen> createState() => _EnterNameScreenState();
 }
 
-class _PhoneVerificationScreenState
-    extends ConsumerState<PhoneVerificationScreen> {
+class _EnterNameScreenState extends ConsumerState<EnterNameScreen> {
   final _formKey = GlobalKey<FormState>();
-  String _phoneNumber = '';
+  final _nameController = TextEditingController();
 
-  void _sendCode() {
+  @override
+  void dispose() {
+    _nameController.dispose();
+    super.dispose();
+  }
+
+  void _continue() {
     if (!_formKey.currentState!.validate()) return;
-    ref.read(authNotifierProvider.notifier).verifyPhoneNumber(_phoneNumber);
+    ref
+        .read(authNotifierProvider.notifier)
+        .updateDisplayName(_nameController.text.trim());
   }
 
   @override
@@ -40,11 +47,8 @@ class _PhoneVerificationScreenState
         return;
       }
       BotToast.closeAllLoading();
-      if (next.status == RequestStatus.success && next.verificationId != null) {
-        context.push(
-          AppRoutes.otpVerification,
-          extra: {'phoneNumber': _phoneNumber},
-        );
+      if (next.status == RequestStatus.success) {
+        context.go(AppRoutes.home);
       } else if (next.status == RequestStatus.failure &&
           next.errorMessage != null) {
         ScaffoldMessenger.of(
@@ -65,7 +69,7 @@ class _PhoneVerificationScreenState
                 children: [
                   const Padding(
                     padding: EdgeInsets.symmetric(horizontal: 8),
-                    child: AppTopBar(title: 'Verify your phone'),
+                    child: AppTopBar(title: 'Almost there'),
                   ),
                   Expanded(
                     child: SingleChildScrollView(
@@ -73,21 +77,25 @@ class _PhoneVerificationScreenState
                       child: Column(
                         children: [
                           Text(
-                            'Enter your phone number',
+                            'What should we call you?',
                             style: textTheme.titleMedium,
                           ),
                           const SizedBox(height: 6),
                           Text(
-                            "We'll text you a code to verify your number",
+                            'This is how you will appear to others on Chatix',
                             textAlign: TextAlign.center,
                             style: textTheme.bodyMedium?.copyWith(
                               color: AppColors.textSecondary,
                             ),
                           ),
                           const SizedBox(height: 32),
-                          AppPhoneField(
-                            label: 'Phone number',
-                            onChanged: (value) => _phoneNumber = value,
+                          AppTextField(
+                            label: 'Name',
+                            hint: 'Enter your full name',
+                            prefixIcon: Icons.person_outline_rounded,
+                            keyboardType: TextInputType.name,
+                            controller: _nameController,
+                            validator: nameValidator,
                           ),
                         ],
                       ),
@@ -95,7 +103,7 @@ class _PhoneVerificationScreenState
                   ),
                   Padding(
                     padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
-                    child: AppButton(label: 'Send code', onPressed: _sendCode),
+                    child: AppButton(label: 'Continue', onPressed: _continue),
                   ),
                 ],
               ),

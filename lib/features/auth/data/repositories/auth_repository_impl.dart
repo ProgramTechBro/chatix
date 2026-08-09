@@ -71,7 +71,7 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Either<Failure, UserEntity>> confirmPhoneOtp(
+  Future<Either<Failure, ({UserEntity user, bool isNewUser})>> confirmPhoneOtp(
     PhoneOtpParams params,
   ) async {
     try {
@@ -79,12 +79,11 @@ class AuthRepositoryImpl implements AuthRepository {
         params.verificationId,
         params.smsCode,
       );
-      final user = await _supabaseDataSource.bridgePhoneAuth(
+      final bridged = await _supabaseDataSource.bridgePhoneAuth(
         phoneNumber: params.phoneNumber,
         firebaseIdToken: idToken,
-        name: params.name,
       );
-      return Right(user);
+      return Right((user: bridged.user, isNewUser: bridged.isNewUser));
     } on FirebaseAuthException catch (error, stackTrace) {
       _logger.logError(error, stackTrace);
       return Left(mapFirebaseAuthError(error));
@@ -136,6 +135,17 @@ class AuthRepositoryImpl implements AuthRepository {
     } catch (error, stackTrace) {
       _logger.logError(error, stackTrace);
       return const Left(AuthFailure('Could not update presence.'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> updateDisplayName(String name) async {
+    try {
+      await _supabaseDataSource.updateDisplayName(name);
+      return const Right(null);
+    } catch (error, stackTrace) {
+      _logger.logError(error, stackTrace);
+      return Left(mapSupabaseAuthError(error));
     }
   }
 }

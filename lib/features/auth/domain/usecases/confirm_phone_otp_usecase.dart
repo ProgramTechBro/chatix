@@ -11,7 +11,9 @@ class ConfirmPhoneOtpUseCase {
 
   final AuthRepository _repository;
 
-  Future<Either<Failure, UserEntity>> call(PhoneOtpParams params) {
+  Future<Either<Failure, ({UserEntity user, bool isNewUser})>> call(
+    PhoneOtpParams params,
+  ) {
     return _repository.confirmPhoneOtp(params);
   }
 }

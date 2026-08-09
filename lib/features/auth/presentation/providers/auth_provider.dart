@@ -7,6 +7,7 @@ import '../../domain/params/phone_otp_params.dart';
 import '../../domain/usecases/confirm_phone_otp_usecase.dart';
 import '../../domain/usecases/sign_in_with_email_usecase.dart';
 import '../../domain/usecases/sign_up_with_email_usecase.dart';
+import '../../domain/usecases/update_display_name_usecase.dart';
 import '../../domain/usecases/verify_phone_number_usecase.dart';
 import 'auth_state.dart';
 
@@ -22,6 +23,8 @@ class AuthNotifier extends _$AuthNotifier {
       getIt<SignInWithEmailUseCase>();
   late final SignUpWithEmailUseCase _signUpWithEmail =
       getIt<SignUpWithEmailUseCase>();
+  late final UpdateDisplayNameUseCase _updateDisplayName =
+      getIt<UpdateDisplayNameUseCase>();
 
   bool _disposed = false;
 
@@ -50,7 +53,6 @@ class AuthNotifier extends _$AuthNotifier {
   Future<void> confirmPhoneOtp({
     required String smsCode,
     required String phoneNumber,
-    required String name,
   }) async {
     final verificationId = state.verificationId;
     if (verificationId == null) return;
@@ -61,7 +63,6 @@ class AuthNotifier extends _$AuthNotifier {
         verificationId: verificationId,
         smsCode: smsCode,
         phoneNumber: phoneNumber,
-        name: name,
       ),
     );
     if (_disposed) return;
@@ -70,10 +71,27 @@ class AuthNotifier extends _$AuthNotifier {
         status: RequestStatus.failure,
         errorMessage: failure.message,
       ),
-      (user) {
-        state = state.copyWith(status: RequestStatus.success, user: user);
-        ref.read(sessionControllerProvider.notifier).setUser(user);
+      (data) {
+        state = state.copyWith(
+          status: RequestStatus.success,
+          user: data.user,
+          isNewUser: data.isNewUser,
+        );
+        ref.read(sessionControllerProvider.notifier).setUser(data.user);
       },
+    );
+  }
+
+  Future<void> updateDisplayName(String name) async {
+    state = state.copyWith(status: RequestStatus.loading, errorMessage: null);
+    final result = await _updateDisplayName(name);
+    if (_disposed) return;
+    result.fold(
+      (failure) => state = state.copyWith(
+        status: RequestStatus.failure,
+        errorMessage: failure.message,
+      ),
+      (_) => state = state.copyWith(status: RequestStatus.success),
     );
   }
 

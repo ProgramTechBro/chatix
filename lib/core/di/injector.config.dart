@@ -39,6 +39,8 @@ import 'package:chatix/features/auth/domain/usecases/sign_out_usecase.dart'
     as _i525;
 import 'package:chatix/features/auth/domain/usecases/sign_up_with_email_usecase.dart'
     as _i824;
+import 'package:chatix/features/auth/domain/usecases/update_display_name_usecase.dart'
+    as _i513;
 import 'package:chatix/features/auth/domain/usecases/update_last_seen_usecase.dart'
     as _i30;
 import 'package:chatix/features/auth/domain/usecases/verify_phone_number_usecase.dart'
@@ -306,11 +308,11 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i229.SendVoiceMessageUseCase>(
       () => _i229.SendVoiceMessageUseCase(gh<_i930.ChatRepository>()),
     );
-    gh.factory<_i642.WatchMessagesUseCase>(
-      () => _i642.WatchMessagesUseCase(gh<_i930.ChatRepository>()),
-    );
     gh.factory<_i504.WatchConversationHeaderUseCase>(
       () => _i504.WatchConversationHeaderUseCase(gh<_i930.ChatRepository>()),
+    );
+    gh.factory<_i642.WatchMessagesUseCase>(
+      () => _i642.WatchMessagesUseCase(gh<_i930.ChatRepository>()),
     );
     gh.factory<_i248.GetFollowersUseCase>(
       () => _i248.GetFollowersUseCase(gh<_i446.ConnectionsRepository>()),
@@ -399,6 +401,9 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factory<_i824.SignUpWithEmailUseCase>(
       () => _i824.SignUpWithEmailUseCase(gh<_i31.AuthRepository>()),
+    );
+    gh.factory<_i513.UpdateDisplayNameUseCase>(
+      () => _i513.UpdateDisplayNameUseCase(gh<_i31.AuthRepository>()),
     );
     gh.factory<_i30.UpdateLastSeenUseCase>(
       () => _i30.UpdateLastSeenUseCase(gh<_i31.AuthRepository>()),

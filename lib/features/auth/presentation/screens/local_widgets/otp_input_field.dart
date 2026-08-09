@@ -45,7 +45,6 @@ class _OtpInputFieldState extends State<OtpInputField> {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Row(

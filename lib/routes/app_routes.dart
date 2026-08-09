@@ -21,6 +21,7 @@ class AppRoutes {
   static const String followers = '/followers/:userId';
   static const String phoneVerification = '/phone-verification';
   static const String otpVerification = '/otp-verification';
+  static const String enterName = '/enter-name';
 
   static String postDetailPath(String postId) => '/post-detail/$postId';
   static String reportPostPath(String postId) => '/report/$postId';
