@@ -21,6 +21,7 @@ mixin _$AuthState {
   UserEntity? get user => throw _privateConstructorUsedError;
   String? get errorMessage => throw _privateConstructorUsedError;
   String? get verificationId => throw _privateConstructorUsedError;
+  bool get isNewUser => throw _privateConstructorUsedError;
 
   /// Create a copy of AuthState
   /// with the given fields replaced by the non-null parameter values.
@@ -39,6 +40,7 @@ abstract class $AuthStateCopyWith<$Res> {
     UserEntity? user,
     String? errorMessage,
     String? verificationId,
+    bool isNewUser,
   });
 }
 
@@ -61,6 +63,7 @@ class _$AuthStateCopyWithImpl<$Res, $Val extends AuthState>
     Object? user = freezed,
     Object? errorMessage = freezed,
     Object? verificationId = freezed,
+    Object? isNewUser = null,
   }) {
     return _then(
       _value.copyWith(
@@ -80,6 +83,10 @@ class _$AuthStateCopyWithImpl<$Res, $Val extends AuthState>
                 ? _value.verificationId
                 : verificationId // ignore: cast_nullable_to_non_nullable
                       as String?,
+            isNewUser: null == isNewUser
+                ? _value.isNewUser
+                : isNewUser // ignore: cast_nullable_to_non_nullable
+                      as bool,
           )
           as $Val,
     );
@@ -100,6 +107,7 @@ abstract class _$$AuthStateImplCopyWith<$Res>
     UserEntity? user,
     String? errorMessage,
     String? verificationId,
+    bool isNewUser,
   });
 }
 
@@ -121,6 +129,7 @@ class __$$AuthStateImplCopyWithImpl<$Res>
     Object? user = freezed,
     Object? errorMessage = freezed,
     Object? verificationId = freezed,
+    Object? isNewUser = null,
   }) {
     return _then(
       _$AuthStateImpl(
@@ -140,6 +149,10 @@ class __$$AuthStateImplCopyWithImpl<$Res>
             ? _value.verificationId
             : verificationId // ignore: cast_nullable_to_non_nullable
                   as String?,
+        isNewUser: null == isNewUser
+            ? _value.isNewUser
+            : isNewUser // ignore: cast_nullable_to_non_nullable
+                  as bool,
       ),
     );
   }
@@ -153,6 +166,7 @@ class _$AuthStateImpl implements _AuthState {
     this.user,
     this.errorMessage,
     this.verificationId,
+    this.isNewUser = false,
   });
 
   @override
@@ -164,10 +178,13 @@ class _$AuthStateImpl implements _AuthState {
   final String? errorMessage;
   @override
   final String? verificationId;
+  @override
+  @JsonKey()
+  final bool isNewUser;
 
   @override
   String toString() {
-    return 'AuthState(status: $status, user: $user, errorMessage: $errorMessage, verificationId: $verificationId)';
+    return 'AuthState(status: $status, user: $user, errorMessage: $errorMessage, verificationId: $verificationId, isNewUser: $isNewUser)';
   }
 
   @override
@@ -180,12 +197,20 @@ class _$AuthStateImpl implements _AuthState {
             (identical(other.errorMessage, errorMessage) ||
                 other.errorMessage == errorMessage) &&
             (identical(other.verificationId, verificationId) ||
-                other.verificationId == verificationId));
+                other.verificationId == verificationId) &&
+            (identical(other.isNewUser, isNewUser) ||
+                other.isNewUser == isNewUser));
   }
 
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, status, user, errorMessage, verificationId);
+  int get hashCode => Object.hash(
+    runtimeType,
+    status,
+    user,
+    errorMessage,
+    verificationId,
+    isNewUser,
+  );
 
   /// Create a copy of AuthState
   /// with the given fields replaced by the non-null parameter values.
@@ -202,6 +227,7 @@ abstract class _AuthState implements AuthState {
     final UserEntity? user,
     final String? errorMessage,
     final String? verificationId,
+    final bool isNewUser,
   }) = _$AuthStateImpl;
 
   @override
@@ -212,6 +238,8 @@ abstract class _AuthState implements AuthState {
   String? get errorMessage;
   @override
   String? get verificationId;
+  @override
+  bool get isNewUser;
 
   /// Create a copy of AuthState
   /// with the given fields replaced by the non-null parameter values.

@@ -9,10 +9,9 @@ abstract class SupabaseAuthRemoteDataSource {
     required String name,
   });
 
-  Future<UserModel> bridgePhoneAuth({
+  Future<({UserModel user, bool isNewUser})> bridgePhoneAuth({
     required String phoneNumber,
     required String firebaseIdToken,
-    required String name,
   });
 
   Future<UserModel?> restoreSession();
@@ -22,4 +21,6 @@ abstract class SupabaseAuthRemoteDataSource {
   Future<void> updateLastSeen();
 
   Future<void> setOffline();
+
+  Future<void> updateDisplayName(String name);
 }

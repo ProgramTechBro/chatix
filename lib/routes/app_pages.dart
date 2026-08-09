@@ -1,5 +1,6 @@
 import 'package:bot_toast/bot_toast.dart';
 import 'package:go_router/go_router.dart';
+import '../features/auth/presentation/screens/enter_name_screen.dart';
 import '../features/auth/presentation/screens/login_screen.dart';
 import '../features/auth/presentation/screens/otp_screen.dart';
 import '../features/auth/presentation/screens/phone_verification_screen.dart';
@@ -122,11 +123,12 @@ final GoRouter appRouter = GoRouter(
       path: AppRoutes.otpVerification,
       builder: (context, state) {
         final extra = state.extra! as Map<String, Object?>;
-        return OtpScreen(
-          phoneNumber: extra['phoneNumber']! as String,
-          name: extra['name']! as String,
-        );
+        return OtpScreen(phoneNumber: extra['phoneNumber']! as String);
       },
+    ),
+    GoRoute(
+      path: AppRoutes.enterName,
+      builder: (context, state) => const EnterNameScreen(),
     ),
   ],
 );

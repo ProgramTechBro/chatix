@@ -11,5 +11,6 @@ class AuthState with _$AuthState {
     UserEntity? user,
     String? errorMessage,
     String? verificationId,
+    @Default(false) bool isNewUser,
   }) = _AuthState;
 }

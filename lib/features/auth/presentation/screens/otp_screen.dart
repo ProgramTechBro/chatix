@@ -11,10 +11,9 @@ import '../providers/auth_provider.dart';
 import 'local_widgets/otp_input_field.dart';
 
 class OtpScreen extends ConsumerWidget {
-  const OtpScreen({super.key, required this.phoneNumber, required this.name});
+  const OtpScreen({super.key, required this.phoneNumber});
 
   final String phoneNumber;
-  final String name;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -28,7 +27,11 @@ class OtpScreen extends ConsumerWidget {
       }
       BotToast.closeAllLoading();
       if (next.status == RequestStatus.success && next.user != null) {
-        context.go(AppRoutes.home);
+        if (next.isNewUser) {
+          context.push(AppRoutes.enterName);
+        } else {
+          context.go(AppRoutes.home);
+        }
       } else if (next.status == RequestStatus.failure &&
           next.errorMessage != null) {
         ScaffoldMessenger.of(
@@ -69,7 +72,6 @@ class OtpScreen extends ConsumerWidget {
                             .confirmPhoneOtp(
                               smsCode: code,
                               phoneNumber: phoneNumber,
-                              name: name,
                             ),
                       ),
                     ],

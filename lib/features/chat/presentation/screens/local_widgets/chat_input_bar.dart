@@ -198,16 +198,14 @@ class _ComposeRow extends StatelessWidget {
             controller: controller,
             onChanged: onChanged,
             onSubmitted: onSubmitted,
-            style: const TextStyle(
-              fontSize: 16,
-            ),
+            style: const TextStyle(fontSize: 16),
             textInputAction: TextInputAction.send,
             decoration: const InputDecoration(
               hintText: 'Message...',
               filled: false,
 
               border: InputBorder.none,
-              focusedBorder:  InputBorder.none,
+              focusedBorder: InputBorder.none,
               enabledBorder: InputBorder.none,
               contentPadding: EdgeInsets.zero,
             ),

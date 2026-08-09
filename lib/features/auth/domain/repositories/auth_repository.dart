@@ -11,7 +11,9 @@ abstract class AuthRepository {
 
   Future<Either<Failure, String>> verifyPhoneNumber(String phoneNumber);
 
-  Future<Either<Failure, UserEntity>> confirmPhoneOtp(PhoneOtpParams params);
+  Future<Either<Failure, ({UserEntity user, bool isNewUser})>> confirmPhoneOtp(
+    PhoneOtpParams params,
+  );
 
   Future<Either<Failure, UserEntity?>> restoreSession();
 
@@ -20,4 +22,6 @@ abstract class AuthRepository {
   Future<Either<Failure, void>> updateLastSeen();
 
   Future<Either<Failure, void>> setOffline();
+
+  Future<Either<Failure, void>> updateDisplayName(String name);
 }

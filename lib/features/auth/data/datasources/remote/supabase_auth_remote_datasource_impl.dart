@@ -38,18 +38,13 @@ class SupabaseAuthRemoteDataSourceImpl implements SupabaseAuthRemoteDataSource {
   }
 
   @override
-  Future<UserModel> bridgePhoneAuth({
+  Future<({UserModel user, bool isNewUser})> bridgePhoneAuth({
     required String phoneNumber,
     required String firebaseIdToken,
-    required String name,
   }) async {
     final result = await _client.functions.invoke(
       'rapid-endpoint',
-      body: {
-        'phone': phoneNumber,
-        'firebaseIdToken': firebaseIdToken,
-        'name': name,
-      },
+      body: {'phone': phoneNumber, 'firebaseIdToken': firebaseIdToken},
     );
     final data = result.data as Map<String, dynamic>;
     final response = await _client.auth.setSession(
@@ -57,7 +52,18 @@ class SupabaseAuthRemoteDataSourceImpl implements SupabaseAuthRemoteDataSource {
     );
     final user = response.user;
     if (user == null) throw ServerException();
-    return UserModel.fromSupabaseUser(user);
+    return (
+      user: UserModel.fromSupabaseUser(user),
+      isNewUser: data['is_new_user'] as bool? ?? false,
+    );
+  }
+
+  @override
+  Future<void> updateDisplayName(String name) async {
+    await _client
+        .from('profiles')
+        .update({'name': name})
+        .eq('id', _client.auth.currentUser!.id);
   }
 
   @override
