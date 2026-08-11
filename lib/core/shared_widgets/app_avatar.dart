@@ -36,7 +36,7 @@ class AppAvatar extends StatelessWidget {
         if (isOnline == true)
           Positioned(
             right: -1,
-            bottom: -1,
+            top: -1,
             child: Container(
               width: radius * 0.4,
               height: radius * 0.4,

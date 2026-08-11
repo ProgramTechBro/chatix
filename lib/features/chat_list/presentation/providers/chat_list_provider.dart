@@ -5,7 +5,7 @@ import '../../domain/usecases/watch_chat_list_usecase.dart';
 
 part 'chat_list_provider.g.dart';
 
-@riverpod
+@Riverpod(keepAlive: true)
 Stream<List<ChatSummaryEntity>> chatList(ChatListRef ref) {
   return getIt<WatchChatListUseCase>().call();
 }

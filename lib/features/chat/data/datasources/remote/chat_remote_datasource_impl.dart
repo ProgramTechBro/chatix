@@ -3,15 +3,17 @@ import 'dart:io';
 
 import 'package:injectable/injectable.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../../../../core/services/logger_service.dart';
 import '../../models/chat_header_model.dart';
 import '../../models/message_model.dart';
 import 'chat_remote_datasource.dart';
 
 @LazySingleton(as: ChatRemoteDataSource)
 class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
-  ChatRemoteDataSourceImpl(this._client);
+  ChatRemoteDataSourceImpl(this._client, this._logger);
 
   final SupabaseClient _client;
+  final LoggerService _logger;
 
   String get _currentUserId => _client.auth.currentUser!.id;
 
@@ -20,36 +22,65 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
         .from('messages')
         .select()
         .eq('conversation_id', conversationId)
-        .order('created_at');
+        .order('created_at', ascending: true);
     return rows.map(MessageModel.fromJson).toList();
   }
 
   @override
   Stream<List<MessageModel>> watchMessages(String conversationId) async* {
-    yield await _fetchMessages(conversationId);
-
     final controller = StreamController<List<MessageModel>>();
-    final channel = _client
-        .channel('messages:$conversationId')
-        .onPostgresChanges(
-          event: PostgresChangeEvent.all,
-          schema: 'public',
-          table: 'messages',
-          filter: PostgresChangeFilter(
-            type: PostgresChangeFilterType.eq,
-            column: 'conversation_id',
-            value: conversationId,
-          ),
-          callback: (payload) async {
-            controller.add(await _fetchMessages(conversationId));
-          },
-        )
-        .subscribe();
+    RealtimeChannel? channel;
+    Timer? retryTimer;
+    var isActive = true;
 
+    void subscribeChannel() {
+      channel = _client
+          .channel(
+            'messages:$conversationId',
+            opts: const RealtimeChannelConfig(private: true),
+          )
+          .onPostgresChanges(
+            event: PostgresChangeEvent.all,
+            schema: 'public',
+            table: 'messages',
+            filter: PostgresChangeFilter(
+              type: PostgresChangeFilterType.eq,
+              column: 'conversation_id',
+              value: conversationId,
+            ),
+            callback: (payload) async {
+              controller.add(await _fetchMessages(conversationId));
+            },
+          )
+          .subscribe((status, error) {
+            _logger.logInfo(
+              'messages:$conversationId subscribe status: $status',
+            );
+            if (error != null) _logger.logError(error);
+            if (status == RealtimeSubscribeStatus.subscribed) {
+              _fetchMessages(conversationId).then((messages) {
+                if (isActive) controller.add(messages);
+              });
+            } else if (isActive &&
+                (status == RealtimeSubscribeStatus.channelError ||
+                    status == RealtimeSubscribeStatus.timedOut)) {
+              final failed = channel;
+              if (failed != null) _client.removeChannel(failed);
+              retryTimer?.cancel();
+              retryTimer = Timer(const Duration(seconds: 3), subscribeChannel);
+            }
+          });
+    }
+
+    subscribeChannel();
+    yield await _fetchMessages(conversationId);
     try {
       yield* controller.stream;
     } finally {
-      await _client.removeChannel(channel);
+      isActive = false;
+      retryTimer?.cancel();
+      final activeChannel = channel;
+      if (activeChannel != null) await _client.removeChannel(activeChannel);
       await controller.close();
     }
   }
@@ -98,7 +129,7 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
       avatarUrl: profile['avatar_url'] as String? ?? '',
       isOnline: profile['is_online'] as bool? ?? false,
       lastSeenAt: profile['last_seen_at'] != null
-          ? DateTime.parse(profile['last_seen_at'] as String)
+          ? DateTime.parse(profile['last_seen_at'] as String).toLocal()
           : null,
     );
   }
@@ -107,32 +138,61 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
   Stream<ChatHeaderModel> watchConversationHeader(
     String conversationId,
   ) async* {
-    var header = await _fetchHeader(conversationId);
-    yield header;
+    final initialHeader = await _fetchHeader(conversationId);
+    yield initialHeader;
 
     final controller = StreamController<ChatHeaderModel>();
-    final channel = _client
-        .channel('profile:${header.otherUserId}')
-        .onPostgresChanges(
-          event: PostgresChangeEvent.update,
-          schema: 'public',
-          table: 'profiles',
-          filter: PostgresChangeFilter(
-            type: PostgresChangeFilterType.eq,
-            column: 'id',
-            value: header.otherUserId,
-          ),
-          callback: (payload) async {
-            header = await _fetchHeader(conversationId);
-            controller.add(header);
-          },
-        )
-        .subscribe();
+    RealtimeChannel? channel;
+    Timer? retryTimer;
+    var isActive = true;
 
+    void subscribeChannel() {
+      channel = _client
+          .channel(
+            'profile:${initialHeader.otherUserId}',
+            opts: const RealtimeChannelConfig(private: true),
+          )
+          .onPostgresChanges(
+            event: PostgresChangeEvent.update,
+            schema: 'public',
+            table: 'profiles',
+            filter: PostgresChangeFilter(
+              type: PostgresChangeFilterType.eq,
+              column: 'id',
+              value: initialHeader.otherUserId,
+            ),
+            callback: (payload) async {
+              controller.add(await _fetchHeader(conversationId));
+            },
+          )
+          .subscribe((status, error) {
+            _logger.logInfo(
+              'profile:${initialHeader.otherUserId} subscribe status: $status',
+            );
+            if (error != null) _logger.logError(error);
+            if (status == RealtimeSubscribeStatus.subscribed) {
+              _fetchHeader(conversationId).then((header) {
+                if (isActive) controller.add(header);
+              });
+            } else if (isActive &&
+                (status == RealtimeSubscribeStatus.channelError ||
+                    status == RealtimeSubscribeStatus.timedOut)) {
+              final failed = channel;
+              if (failed != null) _client.removeChannel(failed);
+              retryTimer?.cancel();
+              retryTimer = Timer(const Duration(seconds: 3), subscribeChannel);
+            }
+          });
+    }
+
+    subscribeChannel();
     try {
       yield* controller.stream;
     } finally {
-      await _client.removeChannel(channel);
+      isActive = false;
+      retryTimer?.cancel();
+      final activeChannel = channel;
+      if (activeChannel != null) await _client.removeChannel(activeChannel);
       await controller.close();
     }
   }

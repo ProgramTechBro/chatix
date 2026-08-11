@@ -10,11 +10,12 @@ import '../../../features/auth/domain/usecases/update_last_seen_usecase.dart';
 import '../../../features/notifications/domain/entities/device_token_entity.dart';
 import '../../../features/notifications/domain/usecases/save_device_token_usecase.dart';
 import '../../di/injector.dart';
+import '../../services/logger_service.dart';
 import '../../services/push_notification_service.dart';
 
 part 'auth_provider.g.dart';
 
-@riverpod
+@Riverpod(keepAlive: true)
 class SessionController extends _$SessionController {
   Timer? _presenceTimer;
   bool _disposed = false;
@@ -86,10 +87,19 @@ class SessionController extends _$SessionController {
     }
 
     final token = await getIt<PushNotificationService>().getToken();
-    if (token == null) return;
+    if (token == null) {
+      getIt<LoggerService>().logError(
+        Exception('Could not obtain FCM token for user $userId'),
+      );
+      return;
+    }
 
-    await getIt<SaveDeviceTokenUseCase>().call(
+    final result = await getIt<SaveDeviceTokenUseCase>().call(
       DeviceTokenEntity(userId: userId, token: token, platform: platform),
+    );
+    result.fold(
+      (failure) => getIt<LoggerService>().logError(Exception(failure.message)),
+      (_) {},
     );
   }
 }

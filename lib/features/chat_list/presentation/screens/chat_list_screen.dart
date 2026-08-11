@@ -1,13 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 import '../../../../config/app_colors.dart';
 import '../../../../core/shared_widgets/app_back_button.dart';
 import '../../../../core/shared_widgets/app_error_view.dart';
-import '../../../../core/shared_widgets/app_loader.dart';
 import '../../../../routes/app_routes.dart';
+import '../../../chat/presentation/providers/typing_indicator_provider.dart';
+import '../../domain/entities/chat_summary_entity.dart';
 import '../providers/chat_list_provider.dart';
 import 'local_widgets/chat_list_card.dart';
+
+final _skeletonChats = List.generate(
+  6,
+  (index) => ChatSummaryEntity(
+    id: 'skeleton-$index',
+    userId: 'skeleton-$index',
+    name: 'Loading name',
+    avatarUrl: '',
+    lastMessage: 'Loading last message preview',
+    lastMessageAt: DateTime.now(),
+    isOnline: false,
+    unreadCount: 0,
+  ),
+);
 
 class ChatListScreen extends ConsumerStatefulWidget {
   const ChatListScreen({super.key});
@@ -78,17 +94,32 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen> {
                     itemCount: filtered.length,
                     itemBuilder: (context, index) {
                       final chat = filtered[index];
-                      return ChatListCard(
-                        chat: chat,
-                        onAvatarTap: () =>
-                            context.push(AppRoutes.profilePath(chat.userId)),
-                        onTap: () =>
-                            context.push(AppRoutes.chatDetailPath(chat.id)),
+                      return Consumer(
+                        builder: (context, ref, _) {
+                          final isTyping = ref.watch(
+                            typingIndicatorProvider(chat.id),
+                          );
+                          return ChatListCard(
+                            chat: chat,
+                            isTyping: isTyping,
+                            onAvatarTap: () => context.push(
+                              AppRoutes.profilePath(chat.userId),
+                            ),
+                            onTap: () =>
+                                context.push(AppRoutes.chatDetailPath(chat.id)),
+                          );
+                        },
                       );
                     },
                   );
                 },
-                loading: () => const AppLoader(),
+                loading: () => Skeletonizer(
+                  child: ListView.builder(
+                    itemCount: _skeletonChats.length,
+                    itemBuilder: (context, index) =>
+                        ChatListCard(chat: _skeletonChats[index]),
+                  ),
+                ),
                 // error: (error, stackTrace) => const AppErrorView(),
                 error: (error, stackTrace) {
                   debugPrint('Chat list error: $error');
