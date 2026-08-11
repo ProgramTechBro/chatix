@@ -9,11 +9,13 @@ class ChatListCard extends StatelessWidget {
   const ChatListCard({
     super.key,
     required this.chat,
+    this.isTyping = false,
     this.onAvatarTap,
     this.onTap,
   });
 
   final ChatSummaryEntity chat;
+  final bool isTyping;
   final VoidCallback? onAvatarTap;
   final VoidCallback? onTap;
 
@@ -63,14 +65,16 @@ class ChatListCard extends StatelessWidget {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            chat.lastMessage,
+                            isTyping ? 'Typing...' : chat.lastMessage,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: textTheme.bodyMedium?.copyWith(
-                              color: hasUnread
+                              color: isTyping
+                                  ? AppColors.online
+                                  : hasUnread
                                   ? AppColors.black
                                   : AppColors.textSecondary,
-                              fontWeight: hasUnread
+                              fontWeight: hasUnread || isTyping
                                   ? FontWeight.w600
                                   : FontWeight.w400,
                             ),

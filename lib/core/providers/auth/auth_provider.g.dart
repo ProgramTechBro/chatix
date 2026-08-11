@@ -23,12 +23,12 @@ final currentUserIdProvider = AutoDisposeProvider<String?>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef CurrentUserIdRef = AutoDisposeProviderRef<String?>;
-String _$sessionControllerHash() => r'f79f71230fd9a8257a7aa728f1452976bc169eba';
+String _$sessionControllerHash() => r'f96812c41b7d4989518ba73c87180b92da86d9a6';
 
 /// See also [SessionController].
 @ProviderFor(SessionController)
 final sessionControllerProvider =
-    AutoDisposeNotifierProvider<SessionController, UserEntity?>.internal(
+    NotifierProvider<SessionController, UserEntity?>.internal(
       SessionController.new,
       name: r'sessionControllerProvider',
       debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
@@ -38,6 +38,6 @@ final sessionControllerProvider =
       allTransitiveDependencies: null,
     );
 
-typedef _$SessionController = AutoDisposeNotifier<UserEntity?>;
+typedef _$SessionController = Notifier<UserEntity?>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

@@ -1,4 +1,5 @@
 import 'package:intl/intl.dart';
+import '../../../../core/extensions/datetime_extension.dart';
 import '../../domain/entities/chat_header_entity.dart';
 
 extension ChatHeaderPresentation on ChatHeaderEntity {
@@ -12,7 +13,11 @@ extension ChatHeaderPresentation on ChatHeaderEntity {
 
   String get presenceLabel {
     if (isActuallyOnline) return 'Online';
-    if (lastSeenAt == null) return 'Offline';
-    return 'Last seen ${DateFormat('h:mm a').format(lastSeenAt!)}';
+    final seen = lastSeenAt;
+    if (seen == null) return 'Offline';
+    final time = DateFormat('h:mm a').format(seen);
+    if (seen.isToday) return 'Last seen today at $time';
+    if (seen.isYesterday) return 'Last seen yesterday at $time';
+    return 'Last seen ${DateFormat('MMM d').format(seen)} at $time';
   }
 }

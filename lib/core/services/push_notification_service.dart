@@ -1,6 +1,15 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:injectable/injectable.dart';
+import '../../features/notifications/data/datasources/local/pending_message_local_datasource.dart';
+import '../../features/notifications/data/datasources/local/pending_message_local_datasource_impl.dart';
+import '../../features/notifications/data/models/pending_message_model.dart';
+import '../../routes/app_pages.dart';
+import '../../routes/app_routes.dart';
+import '../constants/hive_boxes.dart';
+import '../di/injector.dart';
+import 'active_conversation_tracker.dart';
 
 const _chatChannelKey = 'chat_messages';
 
@@ -14,7 +23,22 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
       importance: NotificationImportance.High,
     ),
   ]);
-  await PushNotificationService.showFromRemoteMessage(message);
+  await Hive.initFlutter();
+  if (!Hive.isBoxOpen(HiveBoxes.pendingMessagesCache)) {
+    await Hive.openBox<String>(HiveBoxes.pendingMessagesCache);
+  }
+  await PushNotificationService.handleMessage(
+    message,
+    pendingStore: PendingMessageLocalDataSourceImpl(),
+  );
+}
+
+@pragma('vm:entry-point')
+Future<void> onNotificationActionReceived(ReceivedAction action) async {
+  final conversationId = action.payload?['conversationId'];
+  if (conversationId != null) {
+    appRouter.push(AppRoutes.chatDetailPath(conversationId));
+  }
 }
 
 @lazySingleton
@@ -33,36 +57,89 @@ class PushNotificationService {
 
     await _firebaseMessaging.requestPermission();
 
-    FirebaseMessaging.onMessage.listen(showFromRemoteMessage);
+    await AwesomeNotifications().setListeners(
+      onActionReceivedMethod: onNotificationActionReceived,
+    );
+    final initialAction = await AwesomeNotifications()
+        .getInitialNotificationAction(removeFromActionEvents: false);
+    if (initialAction != null) {
+      await onNotificationActionReceived(initialAction);
+    }
+
+    FirebaseMessaging.onMessage.listen(
+      (message) => handleMessage(
+        message,
+        pendingStore: getIt<PendingMessageLocalDataSource>(),
+        activeConversationId: getIt<ActiveConversationTracker>().current,
+      ),
+    );
   }
 
   Future<String?> getToken() => _firebaseMessaging.getToken();
 
   Stream<String> get onTokenRefresh => _firebaseMessaging.onTokenRefresh;
 
-  static Future<void> showFromRemoteMessage(RemoteMessage message) async {
+  Future<void> clearNotification(String conversationId) {
+    return AwesomeNotifications().cancelNotificationsByGroupKey(conversationId);
+  }
+
+  static Future<void> handleMessage(
+    RemoteMessage message, {
+    required PendingMessageLocalDataSource pendingStore,
+    String? activeConversationId,
+  }) async {
     final data = message.data;
+    final conversationId = data['conversationId'] as String?;
+    if (conversationId == null || conversationId == activeConversationId) {
+      return;
+    }
+
     final senderName = data['senderName'] as String? ?? 'New message';
-    final senderAvatarUrl = data['senderAvatarUrl'] as String?;
-    final body =
+    final senderAvatarUrl = data['senderAvatarUrl'] as String? ?? '';
+    final preview =
         data['preview'] as String? ??
         message.notification?.body ??
         'Sent you a message';
+    final createdAt =
+        DateTime.tryParse(data['createdAt'] as String? ?? '') ?? DateTime.now();
 
-    await AwesomeNotifications().createNotification(
+    await pendingStore.add(
+      conversationId,
+      PendingMessageModel(
+        messageId: data['messageId'] as String? ?? '',
+        senderName: senderName,
+        senderAvatarUrl: senderAvatarUrl,
+        preview: preview,
+        createdAt: createdAt,
+      ),
+    );
+    final pending = await pendingStore.getAll(conversationId);
+
+    await _buildNotification(
+      conversationId: conversationId,
+      senderName: senderName,
+      senderAvatarUrl: senderAvatarUrl,
+      pending: pending,
+    );
+  }
+
+  static Future<void> _buildNotification({
+    required String conversationId,
+    required String senderName,
+    required String senderAvatarUrl,
+    required List<PendingMessageModel> pending,
+  }) {
+    return AwesomeNotifications().createNotification(
       content: NotificationContent(
-        id: DateTime.now().millisecondsSinceEpoch.remainder(1 << 31),
+        id: conversationId.hashCode & 0x7fffffff,
         channelKey: _chatChannelKey,
         title: senderName,
-        body: body,
-        largeIcon: senderAvatarUrl,
-        notificationLayout: senderAvatarUrl != null
-            ? NotificationLayout.MessagingGroup
-            : NotificationLayout.Default,
-        payload: {
-          if (data['conversationId'] != null)
-            'conversationId': data['conversationId'] as String,
-        },
+        body: pending.map((message) => message.preview).join('\n'),
+        summary: pending.length > 1 ? '${pending.length} new messages' : null,
+        groupKey: conversationId,
+        largeIcon: senderAvatarUrl.isNotEmpty ? senderAvatarUrl : null,
+        notificationLayout: NotificationLayout.MessagingGroup,
+        payload: {'conversationId': conversationId},
       ),
     );
   }

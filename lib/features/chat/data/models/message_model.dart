@@ -25,7 +25,21 @@ class MessageModel extends MessageEntity {
       mediaUrl: json['media_url'] as String?,
       mediaDurationMs: json['media_duration_ms'] as int?,
       status: MessageStatus.values.byName(json['status'] as String),
-      createdAt: DateTime.parse(json['created_at'] as String),
+      createdAt: DateTime.parse(json['created_at'] as String).toLocal(),
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'conversation_id': conversationId,
+      'sender_id': senderId,
+      'type': type.name,
+      'text': text,
+      'media_url': mediaUrl,
+      'media_duration_ms': mediaDurationMs,
+      'status': status.name,
+      'created_at': createdAt.toIso8601String(),
+    };
   }
 }

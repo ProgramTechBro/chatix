@@ -2,14 +2,16 @@ import 'dart:async';
 
 import 'package:injectable/injectable.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../../../../core/services/logger_service.dart';
 import '../../models/chat_summary_model.dart';
 import 'chat_list_remote_datasource.dart';
 
 @LazySingleton(as: ChatListRemoteDataSource)
 class ChatListRemoteDataSourceImpl implements ChatListRemoteDataSource {
-  ChatListRemoteDataSourceImpl(this._client);
+  ChatListRemoteDataSourceImpl(this._client, this._logger);
 
   final SupabaseClient _client;
+  final LoggerService _logger;
 
   String get _currentUserId => _client.auth.currentUser!.id;
 
@@ -54,7 +56,9 @@ class ChatListRemoteDataSourceImpl implements ChatListRemoteDataSource {
         .inFilter('id', conversationIds);
     final lastMessageAtByConversation = {
       for (final row in conversationRows)
-        row['id'] as String: DateTime.parse(row['last_message_at'] as String),
+        row['id'] as String: DateTime.parse(
+          row['last_message_at'] as String,
+        ).toLocal(),
     };
 
     final previews = await Future.wait(
@@ -84,7 +88,7 @@ class ChatListRemoteDataSourceImpl implements ChatListRemoteDataSource {
         isOnline: profile['is_online'] as bool? ?? false,
         unreadCount: unreadByConversation[conversationId] ?? 0,
         lastSeenAt: profile['last_seen_at'] != null
-            ? DateTime.parse(profile['last_seen_at'] as String)
+            ? DateTime.parse(profile['last_seen_at'] as String).toLocal()
             : null,
       );
     }).toList();
@@ -95,38 +99,67 @@ class ChatListRemoteDataSourceImpl implements ChatListRemoteDataSource {
 
   @override
   Stream<List<ChatSummaryModel>> watchChatList() async* {
-    yield await _fetchChatList();
-
     final controller = StreamController<List<ChatSummaryModel>>();
-    final channel = _client
-        .channel('conversation_participants:$_currentUserId')
-        .onPostgresChanges(
-          event: PostgresChangeEvent.all,
-          schema: 'public',
-          table: 'conversation_participants',
-          filter: PostgresChangeFilter(
-            type: PostgresChangeFilterType.eq,
-            column: 'user_id',
-            value: _currentUserId,
-          ),
-          callback: (payload) async {
-            controller.add(await _fetchChatList());
-          },
-        )
-        .onPostgresChanges(
-          event: PostgresChangeEvent.update,
-          schema: 'public',
-          table: 'profiles',
-          callback: (payload) async {
-            controller.add(await _fetchChatList());
-          },
-        )
-        .subscribe();
+    RealtimeChannel? channel;
+    Timer? retryTimer;
+    var isActive = true;
 
+    void subscribeChannel() {
+      channel = _client
+          .channel(
+            'conversation_participants:$_currentUserId',
+            opts: const RealtimeChannelConfig(private: true),
+          )
+          .onPostgresChanges(
+            event: PostgresChangeEvent.all,
+            schema: 'public',
+            table: 'conversation_participants',
+            filter: PostgresChangeFilter(
+              type: PostgresChangeFilterType.eq,
+              column: 'user_id',
+              value: _currentUserId,
+            ),
+            callback: (payload) async {
+              controller.add(await _fetchChatList());
+            },
+          )
+          .onPostgresChanges(
+            event: PostgresChangeEvent.update,
+            schema: 'public',
+            table: 'profiles',
+            callback: (payload) async {
+              controller.add(await _fetchChatList());
+            },
+          )
+          .subscribe((status, error) {
+            _logger.logInfo(
+              'conversation_participants:$_currentUserId subscribe status: $status',
+            );
+            if (error != null) _logger.logError(error);
+            if (status == RealtimeSubscribeStatus.subscribed) {
+              _fetchChatList().then((chats) {
+                if (isActive) controller.add(chats);
+              });
+            } else if (isActive &&
+                (status == RealtimeSubscribeStatus.channelError ||
+                    status == RealtimeSubscribeStatus.timedOut)) {
+              final failed = channel;
+              if (failed != null) _client.removeChannel(failed);
+              retryTimer?.cancel();
+              retryTimer = Timer(const Duration(seconds: 3), subscribeChannel);
+            }
+          });
+    }
+
+    subscribeChannel();
+    yield await _fetchChatList();
     try {
       yield* controller.stream;
     } finally {
-      await _client.removeChannel(channel);
+      isActive = false;
+      retryTimer?.cancel();
+      final activeChannel = channel;
+      if (activeChannel != null) await _client.removeChannel(activeChannel);
       await controller.close();
     }
   }

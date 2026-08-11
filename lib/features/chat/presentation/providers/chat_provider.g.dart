@@ -6,7 +6,7 @@ part of 'chat_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$chatMessagesHash() => r'f25e65329d871518777d38a21cf8874cee4eda32';
+String _$chatMessagesHash() => r'9b49bbf7a4616033b214e4a05d17ca8870f9d02d';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -149,7 +149,7 @@ class _ChatMessagesProviderElement
   String get conversationId => (origin as ChatMessagesProvider).conversationId;
 }
 
-String _$chatHeaderHash() => r'056e006967e5fdc4e2f8cc59ad90e078c6a92933';
+String _$chatHeaderHash() => r'3457cd7f70ed2c717cb2275b849d2e7a86c96ab7';
 
 /// See also [chatHeader].
 @ProviderFor(chatHeader)

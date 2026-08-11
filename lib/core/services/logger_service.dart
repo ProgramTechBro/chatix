@@ -12,4 +12,8 @@ class LoggerService {
       stackTrace: stackTrace,
     );
   }
+
+  void logInfo(String message) {
+    developer.log(message, name: 'chatix');
+  }
 }

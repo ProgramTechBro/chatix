@@ -1,12 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 import '../../../../config/app_colors.dart';
 import '../../../../core/di/injector.dart';
+import '../../../../core/enums/message_status.dart';
+import '../../../../core/enums/message_type.dart';
 import '../../../../core/providers/auth/auth_provider.dart';
+import '../../../../core/services/active_conversation_tracker.dart';
+import '../../../../core/services/logger_service.dart';
+import '../../../../core/services/push_notification_service.dart';
 import '../../../../core/shared_widgets/app_error_view.dart';
-import '../../../../core/shared_widgets/app_loader.dart';
 import '../../../../routes/app_routes.dart';
+import '../../../notifications/domain/usecases/clear_pending_messages_usecase.dart';
+import '../../domain/entities/message_entity.dart';
 import '../../domain/usecases/mark_conversation_read_usecase.dart';
 import '../../domain/usecases/send_image_message_usecase.dart';
 import '../../domain/usecases/send_message_usecase.dart';
@@ -14,11 +21,26 @@ import '../../domain/usecases/send_typing_indicator_usecase.dart';
 import '../../domain/usecases/send_voice_message_usecase.dart';
 import '../providers/chat_provider.dart';
 import '../providers/typing_indicator_provider.dart';
+import '../providers/voice_message_provider.dart';
 import 'chat_header_presentation_extension.dart';
 import 'local_widgets/chat_app_bar.dart';
 import 'local_widgets/chat_input_bar.dart';
 import 'local_widgets/message_bubble.dart';
+import 'local_widgets/typing_bubble.dart';
 import 'message_date_grouping.dart';
+
+final _skeletonMessages = List.generate(
+  8,
+  (index) => MessageEntity(
+    id: 'skeleton-$index',
+    conversationId: 'skeleton',
+    senderId: index.isEven ? 'skeleton-me' : 'skeleton-them',
+    type: MessageType.text,
+    text: 'Loading message preview',
+    status: MessageStatus.sent,
+    createdAt: DateTime.now(),
+  ),
+);
 
 class ChatScreen extends ConsumerStatefulWidget {
   const ChatScreen({super.key, required this.conversationId});
@@ -33,7 +55,39 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   @override
   void initState() {
     super.initState();
-    getIt<MarkConversationReadUseCase>().call(widget.conversationId);
+    getIt<ActiveConversationTracker>().current = widget.conversationId;
+    _markAsRead();
+  }
+
+  @override
+  void dispose() {
+    if (getIt<ActiveConversationTracker>().current == widget.conversationId) {
+      getIt<ActiveConversationTracker>().current = null;
+    }
+    super.dispose();
+  }
+
+  Future<void> _markAsRead() async {
+    final result = await getIt<MarkConversationReadUseCase>().call(
+      widget.conversationId,
+    );
+    result.fold(
+      (failure) => getIt<LoggerService>().logError(Exception(failure.message)),
+      (_) {},
+    );
+    await getIt<ClearPendingMessagesUseCase>().call(widget.conversationId);
+    await getIt<PushNotificationService>().clearNotification(
+      widget.conversationId,
+    );
+  }
+
+  void _prefetchVoiceWaveforms(List<MessageEntity> messages) {
+    for (final message in messages) {
+      final mediaUrl = message.mediaUrl;
+      if (message.type == MessageType.voice && mediaUrl != null) {
+        ref.read(voiceMessageProvider(mediaUrl).future);
+      }
+    }
   }
 
   @override
@@ -45,6 +99,16 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     final isTyping = ref.watch(typingIndicatorProvider(widget.conversationId));
     final currentUserId = ref.watch(currentUserIdProvider);
     final textTheme = Theme.of(context).textTheme;
+
+    ref.listen(chatMessagesProvider(widget.conversationId), (previous, next) {
+      final prevMessages = previous?.valueOrNull;
+      final currMessages = next.valueOrNull;
+      if (currMessages == null || currMessages.isEmpty) return;
+      if (prevMessages != null && prevMessages.length == currMessages.length) {
+        return;
+      }
+      if (currMessages.last.senderId != currentUserId) _markAsRead();
+    });
 
     return Scaffold(
       backgroundColor: AppColors.white,
@@ -71,17 +135,23 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
             Expanded(
               child: messagesAsync.when(
                 data: (messages) {
+                  _prefetchVoiceWaveforms(messages);
                   final header = headerAsync.valueOrNull;
                   final items = groupMessagesByDate(messages);
+                  final itemCount = items.length + (isTyping ? 1 : 0);
                   return ListView.builder(
                     reverse: true,
                     padding: const EdgeInsets.symmetric(
                       horizontal: 20,
                       vertical: 8,
                     ),
-                    itemCount: items.length,
+                    itemCount: itemCount,
                     itemBuilder: (context, index) {
-                      final item = items[items.length - 1 - index];
+                      if (isTyping && index == 0) {
+                        return TypingBubble(avatarUrl: header?.avatarUrl);
+                      }
+                      final itemIndex = isTyping ? index - 1 : index;
+                      final item = items[items.length - 1 - itemIndex];
                       if (item is DateHeaderItem) {
                         return Padding(
                           padding: const EdgeInsets.symmetric(vertical: 12),
@@ -98,6 +168,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                       final message = (item as MessageItem).message;
                       final isMine = message.senderId == currentUserId;
                       return MessageBubble(
+                        key: ValueKey(message.id),
                         message: message,
                         isMine: isMine,
                         avatarUrl: isMine ? null : header?.avatarUrl,
@@ -105,7 +176,20 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                     },
                   );
                 },
-                loading: () => const AppLoader(),
+                loading: () => Skeletonizer(
+                  child: ListView.builder(
+                    reverse: true,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 8,
+                    ),
+                    itemCount: _skeletonMessages.length,
+                    itemBuilder: (context, index) => MessageBubble(
+                      message: _skeletonMessages[index],
+                      isMine: index.isEven,
+                    ),
+                  ),
+                ),
                 error: (error, stackTrace) => const AppErrorView(),
               ),
             ),
