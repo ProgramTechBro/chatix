@@ -1,12 +1,16 @@
+import 'dart:io';
+
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:skeletonizer/skeletonizer.dart';
+import 'package:uuid/uuid.dart';
 import '../../../../config/app_colors.dart';
 import '../../../../core/di/injector.dart';
 import '../../../../core/enums/message_status.dart';
 import '../../../../core/enums/message_type.dart';
+import '../../../../core/errors/failures.dart';
 import '../../../../core/providers/auth/auth_provider.dart';
 import '../../../../core/services/active_conversation_tracker.dart';
 import '../../../../core/services/logger_service.dart';
@@ -21,6 +25,7 @@ import '../../domain/usecases/send_message_usecase.dart';
 import '../../domain/usecases/send_typing_indicator_usecase.dart';
 import '../../domain/usecases/send_voice_message_usecase.dart';
 import '../providers/chat_provider.dart';
+import '../providers/optimistic_messages_provider.dart';
 import '../providers/typing_indicator_provider.dart';
 import '../providers/voice_message_provider.dart';
 import 'chat_header_presentation_extension.dart';
@@ -30,18 +35,18 @@ import 'local_widgets/message_bubble.dart';
 import 'local_widgets/typing_bubble.dart';
 import 'message_date_grouping.dart';
 
-final _skeletonMessages = List.generate(
-  8,
-  (index) => MessageEntity(
-    id: 'skeleton-$index',
-    conversationId: 'skeleton',
-    senderId: index.isEven ? 'skeleton-me' : 'skeleton-them',
-    type: MessageType.text,
-    text: 'Loading message preview',
-    status: MessageStatus.sent,
-    createdAt: DateTime.now(),
-  ),
-);
+const _uuid = Uuid();
+
+List<MessageEntity> _mergeMessages(
+  List<MessageEntity> real,
+  List<MessageEntity> optimistic,
+) {
+  final realIds = real.map((message) => message.id).toSet();
+  return [
+    ...real,
+    ...optimistic.where((message) => !realIds.contains(message.id)),
+  ];
+}
 
 class ChatScreen extends ConsumerStatefulWidget {
   const ChatScreen({super.key, required this.conversationId});
@@ -53,6 +58,8 @@ class ChatScreen extends ConsumerStatefulWidget {
 }
 
 class _ChatScreenState extends ConsumerState<ChatScreen> {
+  final Map<String, String> _sentMediaPaths = {};
+
   @override
   void initState() {
     super.initState();
@@ -85,9 +92,136 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   void _prefetchVoiceWaveforms(List<MessageEntity> messages) {
     for (final message in messages) {
       final mediaUrl = message.mediaUrl;
-      if (message.type == MessageType.voice && mediaUrl != null) {
+      final hasEmbeddedSamples = message.waveformSamples?.isNotEmpty ?? false;
+      if (message.type == MessageType.voice &&
+          mediaUrl != null &&
+          !hasEmbeddedSamples) {
         ref.read(voiceMessageProvider(mediaUrl).future);
       }
+    }
+  }
+
+  void _prefetchImages(List<MessageEntity> messages) {
+    for (final message in messages) {
+      final mediaUrl = message.mediaUrl;
+      if (message.type == MessageType.image &&
+          mediaUrl != null &&
+          !_sentMediaPaths.containsKey(message.id)) {
+        precacheImage(CachedNetworkImageProvider(mediaUrl), context);
+      }
+    }
+  }
+
+  MessageEntity _withLocalMediaOverride(MessageEntity message) {
+    final localPath = _sentMediaPaths[message.id];
+    return localPath == null ? message : message.copyWith(mediaUrl: localPath);
+  }
+
+  MessageEntity _buildOptimisticMessage({
+    required String id,
+    required MessageType type,
+    String? text,
+    String? mediaUrl,
+    int? mediaDurationMs,
+    List<double>? waveformSamples,
+  }) {
+    return MessageEntity(
+      id: id,
+      conversationId: widget.conversationId,
+      senderId: ref.read(currentUserIdProvider) ?? '',
+      type: type,
+      text: text,
+      mediaUrl: mediaUrl,
+      mediaDurationMs: mediaDurationMs,
+      status: MessageStatus.sent,
+      createdAt: DateTime.now(),
+      waveformSamples: waveformSamples,
+      isSending: true,
+    );
+  }
+
+  void _logSendFailure(String label, Failure failure) {
+    getIt<LoggerService>().logError(
+      Exception('$label failed: ${failure.message}'),
+    );
+  }
+
+  Future<void> _sendText(String text) async {
+    final id = _uuid.v4();
+    final notifier = ref.read(
+      optimisticMessagesProvider(widget.conversationId).notifier,
+    );
+    final optimistic = _buildOptimisticMessage(
+      id: id,
+      type: MessageType.text,
+      text: text,
+    );
+    notifier.add(optimistic);
+    try {
+      final result = await getIt<SendMessageUseCase>().call(
+        id: id,
+        conversationId: widget.conversationId,
+        text: text,
+      );
+      result.fold((failure) => _logSendFailure('Send text', failure), (_) {});
+    } finally {
+      notifier.remove(id);
+    }
+  }
+
+  Future<void> _sendImage(File file) async {
+    final id = _uuid.v4();
+    _sentMediaPaths[id] = file.path;
+    final notifier = ref.read(
+      optimisticMessagesProvider(widget.conversationId).notifier,
+    );
+    final optimistic = _buildOptimisticMessage(
+      id: id,
+      type: MessageType.image,
+      mediaUrl: file.path,
+    );
+    notifier.add(optimistic);
+    try {
+      final result = await getIt<SendImageMessageUseCase>().call(
+        id: id,
+        conversationId: widget.conversationId,
+        imageFile: file,
+      );
+      result.fold((failure) => _logSendFailure('Send image', failure), (_) {});
+    } finally {
+      notifier.remove(id);
+    }
+  }
+
+  Future<void> _sendVoice(
+    File file,
+    int durationMs,
+    List<double> waveformSamples,
+  ) async {
+    final id = _uuid.v4();
+    _sentMediaPaths[id] = file.path;
+    final notifier = ref.read(
+      optimisticMessagesProvider(widget.conversationId).notifier,
+    );
+    final optimistic = _buildOptimisticMessage(
+      id: id,
+      type: MessageType.voice,
+      mediaUrl: file.path,
+      mediaDurationMs: durationMs,
+      waveformSamples: waveformSamples,
+    );
+    notifier.add(optimistic);
+    try {
+      final result = await getIt<SendVoiceMessageUseCase>().call(
+        id: id,
+        conversationId: widget.conversationId,
+        audioFile: file,
+        durationMs: durationMs,
+        waveformSamples: waveformSamples,
+      );
+      result.fold((failure) => _logSendFailure('Send voice', failure), (_) {});
+    } finally {
+      notifier.remove(id);
     }
   }
 
@@ -96,6 +230,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     final headerAsync = ref.watch(chatHeaderProvider(widget.conversationId));
     final messagesAsync = ref.watch(
       chatMessagesProvider(widget.conversationId),
+    );
+    final optimisticMessages = ref.watch(
+      optimisticMessagesProvider(widget.conversationId),
     );
     final isTyping = ref.watch(typingIndicatorProvider(widget.conversationId));
     final currentUserId = ref.watch(currentUserIdProvider);
@@ -135,8 +272,13 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
             const Divider(color: AppColors.divider, height: 1, thickness: 1),
             Expanded(
               child: messagesAsync.when(
-                data: (messages) {
+                data: (realMessages) {
+                  final messages = _mergeMessages(
+                    realMessages,
+                    optimisticMessages,
+                  ).map(_withLocalMediaOverride).toList();
                   _prefetchVoiceWaveforms(messages);
+                  _prefetchImages(messages);
                   final header = headerAsync.valueOrNull;
                   final items = groupMessagesByDate(messages);
                   final itemCount = items.length + (isTyping ? 1 : 0);
@@ -178,40 +320,16 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                     },
                   );
                 },
-                loading: () => Skeletonizer(
-                  child: ListView.builder(
-                    reverse: true,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 8,
-                    ),
-                    itemCount: _skeletonMessages.length,
-                    itemBuilder: (context, index) => MessageBubble(
-                      message: _skeletonMessages[index],
-                      isMine: index.isEven,
-                    ),
-                  ),
-                ),
+                loading: () => const SizedBox.shrink(),
                 error: (error, stackTrace) => const AppErrorView(),
               ),
             ),
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
               child: ChatInputBar(
-                onSend: (text) => getIt<SendMessageUseCase>().call(
-                  conversationId: widget.conversationId,
-                  text: text,
-                ),
-                onSendImage: (file) => getIt<SendImageMessageUseCase>().call(
-                  conversationId: widget.conversationId,
-                  imageFile: file,
-                ),
-                onSendVoice: (file, durationMs) =>
-                    getIt<SendVoiceMessageUseCase>().call(
-                      conversationId: widget.conversationId,
-                      audioFile: file,
-                      durationMs: durationMs,
-                    ),
+                onSend: _sendText,
+                onSendImage: _sendImage,
+                onSendVoice: _sendVoice,
                 onTyping: () => getIt<SendTypingIndicatorUseCase>().call(
                   widget.conversationId,
                 ),

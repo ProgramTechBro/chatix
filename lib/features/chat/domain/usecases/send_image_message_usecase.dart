@@ -14,6 +14,7 @@ class SendImageMessageUseCase {
   final ChatRepository _repository;
 
   Future<Either<Failure, void>> call({
+    required String id,
     required String conversationId,
     required File imageFile,
   }) async {
@@ -25,6 +26,7 @@ class SendImageMessageUseCase {
       Left.new,
       (url) => _repository.sendMessage(
         SendMessageParams(
+          id: id,
           conversationId: conversationId,
           type: MessageType.image,
           mediaUrl: url,

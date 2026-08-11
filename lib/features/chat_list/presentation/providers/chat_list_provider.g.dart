@@ -23,5 +23,22 @@ final chatListProvider = StreamProvider<List<ChatSummaryEntity>>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef ChatListRef = StreamProviderRef<List<ChatSummaryEntity>>;
+String _$chatListReadyHash() => r'8b1102cd7bdbf464487cf3cd87d7deae5be2d1dc';
+
+/// See also [chatListReady].
+@ProviderFor(chatListReady)
+final chatListReadyProvider = FutureProvider<List<ChatSummaryEntity>>.internal(
+  chatListReady,
+  name: r'chatListReadyProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$chatListReadyHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef ChatListReadyRef = FutureProviderRef<List<ChatSummaryEntity>>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

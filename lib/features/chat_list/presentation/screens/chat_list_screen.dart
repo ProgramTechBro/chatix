@@ -6,6 +6,7 @@ import '../../../../config/app_colors.dart';
 import '../../../../core/shared_widgets/app_back_button.dart';
 import '../../../../core/shared_widgets/app_error_view.dart';
 import '../../../../routes/app_routes.dart';
+import '../../../chat/presentation/providers/chat_provider.dart';
 import '../../../chat/presentation/providers/typing_indicator_provider.dart';
 import '../../domain/entities/chat_summary_entity.dart';
 import '../providers/chat_list_provider.dart';
@@ -45,6 +46,7 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen> {
   @override
   Widget build(BuildContext context) {
     final chatsAsync = ref.watch(chatListProvider);
+    final readyAsync = ref.watch(chatListReadyProvider);
     final textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
@@ -77,6 +79,15 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen> {
             Expanded(
               child: chatsAsync.when(
                 data: (chats) {
+                  if (!readyAsync.hasValue) {
+                    return Skeletonizer(
+                      child: ListView.builder(
+                        itemCount: _skeletonChats.length,
+                        itemBuilder: (context, index) =>
+                            ChatListCard(chat: _skeletonChats[index]),
+                      ),
+                    );
+                  }
                   final filtered = chats
                       .where((chat) => chat.name.toLowerCase().contains(_query))
                       .toList();
@@ -105,8 +116,11 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen> {
                             onAvatarTap: () => context.push(
                               AppRoutes.profilePath(chat.userId),
                             ),
-                            onTap: () =>
-                                context.push(AppRoutes.chatDetailPath(chat.id)),
+                            onTap: () {
+                              ref.read(chatMessagesProvider(chat.id).future);
+                              ref.read(chatHeaderProvider(chat.id).future);
+                              context.push(AppRoutes.chatDetailPath(chat.id));
+                            },
                           );
                         },
                       );

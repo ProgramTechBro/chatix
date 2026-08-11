@@ -33,11 +33,13 @@ class ChatRepositoryImpl implements ChatRepository {
   Future<Either<Failure, void>> sendMessage(SendMessageParams params) async {
     try {
       await _remoteDataSource.sendMessage(
+        id: params.id,
         conversationId: params.conversationId,
         type: params.type.name,
         text: params.text,
         mediaUrl: params.mediaUrl,
         mediaDurationMs: params.mediaDurationMs,
+        waveformSamples: params.waveformSamples,
       );
       return const Right(null);
     } catch (_) {

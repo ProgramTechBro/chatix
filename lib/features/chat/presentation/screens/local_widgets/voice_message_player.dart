@@ -15,12 +15,14 @@ class VoiceMessagePlayer extends ConsumerStatefulWidget {
     required this.totalDuration,
     required this.color,
     required this.textStyle,
+    this.waveformSamples,
   });
 
   final String audioUrl;
   final Duration totalDuration;
   final Color color;
   final TextStyle? textStyle;
+  final List<double>? waveformSamples;
 
   @override
   ConsumerState<VoiceMessagePlayer> createState() => _VoiceMessagePlayerState();
@@ -34,6 +36,9 @@ class _VoiceMessagePlayerState extends ConsumerState<VoiceMessagePlayer> {
   bool _isPlaying = false;
   bool _isCompleted = false;
   Duration _position = Duration.zero;
+
+  bool get _hasEmbeddedSamples => widget.waveformSamples?.isNotEmpty ?? false;
+  bool get _isLocalFile => !widget.audioUrl.startsWith('http');
 
   @override
   void initState() {
@@ -69,11 +74,13 @@ class _VoiceMessagePlayerState extends ConsumerState<VoiceMessagePlayer> {
     }
     if (!_isPlayerReady) {
       setState(() => _isPreparingPlayback = true);
-      final waveform = await ref.read(
-        voiceMessageProvider(widget.audioUrl).future,
-      );
+      final localPath = _isLocalFile
+          ? widget.audioUrl
+          : (await ref.read(
+              voiceMessageProvider(widget.audioUrl).future,
+            )).localFilePath;
       await _controller.preparePlayer(
-        path: waveform.localFilePath,
+        path: localPath,
         shouldExtractWaveform: false,
       );
       await _controller.setFinishMode(finishMode: FinishMode.pause);
@@ -90,9 +97,27 @@ class _VoiceMessagePlayerState extends ConsumerState<VoiceMessagePlayer> {
     await _controller.startPlayer();
   }
 
+  Widget _buildWaveform(List<double> samples) {
+    return AudioFileWaveforms(
+      key: ValueKey(widget.audioUrl),
+      size: const Size(_waveformWidth, _waveformHeight),
+      playerController: _controller,
+      waveformData: samples,
+      waveformType: WaveformType.fitWidth,
+      enableSeekGesture: true,
+      animationDuration: const Duration(milliseconds: 1),
+      playerWaveStyle: PlayerWaveStyle(
+        fixedWaveColor: widget.color.withValues(alpha: 0.35),
+        liveWaveColor: widget.color,
+        seekLineColor: widget.color,
+        spacing: _waveformSpacing,
+        waveThickness: 2.5,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final waveformAsync = ref.watch(voiceMessageProvider(widget.audioUrl));
     final hasProgress = _isPlaying || _position > Duration.zero;
     final remaining = widget.totalDuration - _position;
     final displayDuration = hasProgress && !remaining.isNegative
@@ -125,28 +150,21 @@ class _VoiceMessagePlayerState extends ConsumerState<VoiceMessagePlayer> {
           ),
         ),
         const SizedBox(width: 8),
-        waveformAsync.when(
-          data: (waveform) => AudioFileWaveforms(
-            key: ValueKey(widget.audioUrl),
-            size: const Size(_waveformWidth, _waveformHeight),
-            playerController: _controller,
-            waveformData: waveform.samples,
-            waveformType: WaveformType.fitWidth,
-            enableSeekGesture: true,
-            animationDuration: const Duration(milliseconds: 1),
-            playerWaveStyle: PlayerWaveStyle(
-              fixedWaveColor: widget.color.withValues(alpha: 0.35),
-              liveWaveColor: widget.color,
-              seekLineColor: widget.color,
-              spacing: _waveformSpacing,
-              waveThickness: 2.5,
-            ),
-          ),
-          loading: () =>
-              const SizedBox(width: _waveformWidth, height: _waveformHeight),
-          error: (error, stackTrace) =>
-              const SizedBox(width: _waveformWidth, height: _waveformHeight),
-        ),
+        _hasEmbeddedSamples
+            ? _buildWaveform(widget.waveformSamples!)
+            : ref
+                  .watch(voiceMessageProvider(widget.audioUrl))
+                  .when(
+                    data: (waveform) => _buildWaveform(waveform.samples),
+                    loading: () => const SizedBox(
+                      width: _waveformWidth,
+                      height: _waveformHeight,
+                    ),
+                    error: (error, stackTrace) => const SizedBox(
+                      width: _waveformWidth,
+                      height: _waveformHeight,
+                    ),
+                  ),
         const SizedBox(width: 8),
         Text(formatDuration(displayDuration), style: widget.textStyle),
       ],

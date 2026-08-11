@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -89,11 +91,25 @@ class _MessageContent extends StatelessWidget {
   Widget build(BuildContext context) {
     switch (message.type) {
       case MessageType.image:
+        final mediaUrl = message.mediaUrl!;
+        final isLocalFile = !mediaUrl.startsWith('http');
         return ClipRRect(
           borderRadius: BorderRadius.circular(16),
-          child: CachedNetworkImage(
-            imageUrl: message.mediaUrl!,
-            fit: BoxFit.cover,
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              isLocalFile
+                  ? Image.file(File(mediaUrl), fit: BoxFit.cover)
+                  : CachedNetworkImage(imageUrl: mediaUrl, fit: BoxFit.cover),
+              if (message.isSending)
+                const Padding(
+                  padding: EdgeInsets.all(12),
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: AppColors.white,
+                  ),
+                ),
+            ],
           ),
         );
       case MessageType.voice:
@@ -102,6 +118,7 @@ class _MessageContent extends StatelessWidget {
           totalDuration: Duration(milliseconds: message.mediaDurationMs ?? 0),
           color: textStyle?.color ?? AppColors.black,
           textStyle: textStyle,
+          waveformSamples: message.waveformSamples,
         );
       case MessageType.text:
         return Text(message.text ?? '', style: textStyle);

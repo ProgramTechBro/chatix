@@ -23,7 +23,7 @@ final currentUserIdProvider = AutoDisposeProvider<String?>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef CurrentUserIdRef = AutoDisposeProviderRef<String?>;
-String _$sessionControllerHash() => r'f96812c41b7d4989518ba73c87180b92da86d9a6';
+String _$sessionControllerHash() => r'05cf4213fdca41c8ea2c0f3a4cfc6d1248c508db';
 
 /// See also [SessionController].
 @ProviderFor(SessionController)

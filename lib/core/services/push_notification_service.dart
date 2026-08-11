@@ -1,3 +1,5 @@
+import 'dart:developer' as developer;
+
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -10,6 +12,7 @@ import '../../routes/app_routes.dart';
 import '../constants/hive_boxes.dart';
 import '../di/injector.dart';
 import '../enums/message_type.dart';
+import '../utils/helpers/stable_hash.dart';
 import 'active_conversation_tracker.dart';
 
 const _chatChannelKey = 'chat_messages';
@@ -140,7 +143,11 @@ class PushNotificationService {
     required String senderAvatarUrl,
     required List<PendingMessageModel> pending,
   }) {
-    final id = conversationId.hashCode & 0x7fffffff;
+    final id = stableHash(conversationId);
+    developer.log(
+      'Building notification: conversationId=$conversationId id=$id pendingCount=${pending.length}',
+      name: 'chatix',
+    );
     final largeIcon = senderAvatarUrl.isNotEmpty ? senderAvatarUrl : null;
     final singleImage =
         pending.length == 1 && pending.first.type == MessageType.image

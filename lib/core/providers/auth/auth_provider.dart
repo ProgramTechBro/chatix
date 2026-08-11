@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../features/auth/domain/entities/user_entity.dart';
+import '../../../features/chat_list/presentation/providers/chat_list_provider.dart';
 import '../../../features/auth/domain/usecases/restore_session_usecase.dart';
 import '../../../features/auth/domain/usecases/set_offline_usecase.dart';
 import '../../../features/auth/domain/usecases/sign_out_usecase.dart';
@@ -37,6 +38,7 @@ class SessionController extends _$SessionController {
       if (user != null) {
         _startPresenceHeartbeat();
         _registerDeviceToken(user.id);
+        ref.read(chatListReadyProvider);
       }
     });
   }
@@ -45,6 +47,7 @@ class SessionController extends _$SessionController {
     state = user;
     _startPresenceHeartbeat();
     _registerDeviceToken(user.id);
+    ref.read(chatListReadyProvider);
   }
 
   Future<void> signOut() async {
