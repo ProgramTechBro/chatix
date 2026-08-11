@@ -20,6 +20,8 @@ class PendingMessagesRepositoryImpl implements PendingMessagesRepository {
         senderAvatarUrl: message.senderAvatarUrl,
         preview: message.preview,
         createdAt: message.createdAt,
+        type: message.type,
+        mediaUrl: message.mediaUrl,
       ),
     );
   }

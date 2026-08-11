@@ -1,3 +1,4 @@
+import '../../../../core/enums/message_type.dart';
 import '../../domain/entities/pending_message_entity.dart';
 
 class PendingMessageModel extends PendingMessageEntity {
@@ -7,6 +8,8 @@ class PendingMessageModel extends PendingMessageEntity {
     required super.senderAvatarUrl,
     required super.preview,
     required super.createdAt,
+    required super.type,
+    super.mediaUrl,
   });
 
   factory PendingMessageModel.fromJson(Map<String, dynamic> json) {
@@ -16,6 +19,8 @@ class PendingMessageModel extends PendingMessageEntity {
       senderAvatarUrl: json['sender_avatar_url'] as String,
       preview: json['preview'] as String,
       createdAt: DateTime.parse(json['created_at'] as String),
+      type: MessageType.values.byName(json['type'] as String),
+      mediaUrl: json['media_url'] as String?,
     );
   }
 
@@ -26,6 +31,8 @@ class PendingMessageModel extends PendingMessageEntity {
       'sender_avatar_url': senderAvatarUrl,
       'preview': preview,
       'created_at': createdAt.toIso8601String(),
+      'type': type.name,
+      'media_url': mediaUrl,
     };
   }
 }

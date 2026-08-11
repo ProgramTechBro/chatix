@@ -133,6 +133,7 @@ class _VoiceMessagePlayerState extends ConsumerState<VoiceMessagePlayer> {
             waveformData: waveform.samples,
             waveformType: WaveformType.fitWidth,
             enableSeekGesture: true,
+            animationDuration: const Duration(milliseconds: 1),
             playerWaveStyle: PlayerWaveStyle(
               fixedWaveColor: widget.color.withValues(alpha: 0.35),
               liveWaveColor: widget.color,
