@@ -23,9 +23,13 @@ final chatListProvider = StreamProvider<List<ChatSummaryEntity>>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef ChatListRef = StreamProviderRef<List<ChatSummaryEntity>>;
-String _$chatListReadyHash() => r'0f70e87b1ce5d67c269c0dabcff50490de551ece';
+String _$chatListReadyHash() => r'9c98e9214833f7b9eb48e6591eda70ce296dca4f';
 
-/// See also [chatListReady].
+/// Resolves as soon as the chat list itself is available (cache-first, so this
+/// is near-instant on every app reopen). The chat list screen gates its
+/// skeleton on this alone — it never waits on header/image warmup.
+///
+/// Copied from [chatListReady].
 @ProviderFor(chatListReady)
 final chatListReadyProvider = FutureProvider<List<ChatSummaryEntity>>.internal(
   chatListReady,
@@ -40,5 +44,27 @@ final chatListReadyProvider = FutureProvider<List<ChatSummaryEntity>>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef ChatListReadyRef = FutureProviderRef<List<ChatSummaryEntity>>;
+String _$chatListWarmupHash() => r'4ac9b7f22f3bd7e4ec087106e9007a39b7335fdf';
+
+/// Warms up the header and image cache for the most recent conversations in
+/// the background, plus keeps listening for newly-arriving images in those
+/// conversations for the rest of the session. Triggered fire-and-forget at
+/// login/session-restore; never blocks the chat list screen's own render.
+///
+/// Copied from [chatListWarmup].
+@ProviderFor(chatListWarmup)
+final chatListWarmupProvider = FutureProvider<void>.internal(
+  chatListWarmup,
+  name: r'chatListWarmupProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$chatListWarmupHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef ChatListWarmupRef = FutureProviderRef<void>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

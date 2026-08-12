@@ -23,6 +23,7 @@ Future<void> main() async {
     Hive.openBox<String>(HiveBoxes.chatListCache),
     Hive.openBox<String>(HiveBoxes.chatMessagesCache),
     Hive.openBox<String>(HiveBoxes.pendingMessagesCache),
+    Hive.openBox<String>(HiveBoxes.chatHeaderCache),
   ]);
   FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
   configureDependencies();
