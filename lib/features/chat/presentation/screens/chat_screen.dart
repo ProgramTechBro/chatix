@@ -17,6 +17,7 @@ import '../../../../core/services/active_conversation_tracker.dart';
 import '../../../../core/services/logger_service.dart';
 import '../../../../core/services/push_notification_service.dart';
 import '../../../../core/shared_widgets/app_error_view.dart';
+import '../../../../core/utils/helpers/blurhash_encoder.dart';
 import '../../../../routes/app_routes.dart';
 import '../../../notifications/domain/usecases/clear_pending_messages_usecase.dart';
 import '../../domain/entities/message_entity.dart';
@@ -203,6 +204,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       id: id,
       conversationId: widget.conversationId,
       imageFile: file,
+      blurHashFuture: encodeBlurHash(file),
     );
     _onSendResult(id, result, 'Send image');
   }

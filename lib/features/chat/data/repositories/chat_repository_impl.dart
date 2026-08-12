@@ -40,6 +40,7 @@ class ChatRepositoryImpl implements ChatRepository {
         mediaUrl: params.mediaUrl,
         mediaDurationMs: params.mediaDurationMs,
         waveformSamples: params.waveformSamples,
+        blurHash: params.blurHash,
       );
       return const Right(null);
     } catch (_) {

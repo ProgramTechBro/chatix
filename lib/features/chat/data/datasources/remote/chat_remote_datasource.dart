@@ -14,6 +14,7 @@ abstract class ChatRemoteDataSource {
     String? mediaUrl,
     int? mediaDurationMs,
     List<double>? waveformSamples,
+    String? blurHash,
   });
 
   Future<String> uploadChatMedia(String conversationId, File file);

@@ -94,6 +94,7 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
     String? mediaUrl,
     int? mediaDurationMs,
     List<double>? waveformSamples,
+    String? blurHash,
   }) async {
     await _client.from('messages').insert({
       'id': id,
@@ -104,6 +105,7 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
       'media_url': mediaUrl,
       'media_duration_ms': mediaDurationMs,
       'waveform_samples': waveformSamples,
+      'blur_hash': blurHash,
     });
   }
 

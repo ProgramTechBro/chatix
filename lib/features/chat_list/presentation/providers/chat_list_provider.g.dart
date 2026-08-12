@@ -23,7 +23,7 @@ final chatListProvider = StreamProvider<List<ChatSummaryEntity>>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef ChatListRef = StreamProviderRef<List<ChatSummaryEntity>>;
-String _$chatListReadyHash() => r'309153137cb41609fe35f69c0c7769c687a24aa7';
+String _$chatListReadyHash() => r'0f70e87b1ce5d67c269c0dabcff50490de551ece';
 
 /// See also [chatListReady].
 @ProviderFor(chatListReady)

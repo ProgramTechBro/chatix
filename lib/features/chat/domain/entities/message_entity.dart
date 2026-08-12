@@ -13,6 +13,7 @@ class MessageEntity {
     required this.status,
     required this.createdAt,
     this.waveformSamples,
+    this.blurHash,
     this.isSending = false,
   });
 
@@ -26,6 +27,7 @@ class MessageEntity {
   final MessageStatus status;
   final DateTime createdAt;
   final List<double>? waveformSamples;
+  final String? blurHash;
   final bool isSending;
 
   MessageEntity copyWith({String? mediaUrl}) {
@@ -40,6 +42,7 @@ class MessageEntity {
       status: status,
       createdAt: createdAt,
       waveformSamples: waveformSamples,
+      blurHash: blurHash,
       isSending: isSending,
     );
   }

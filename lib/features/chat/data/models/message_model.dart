@@ -14,6 +14,7 @@ class MessageModel extends MessageEntity {
     required super.status,
     required super.createdAt,
     super.waveformSamples,
+    super.blurHash,
   });
 
   factory MessageModel.fromJson(Map<String, dynamic> json) {
@@ -30,6 +31,7 @@ class MessageModel extends MessageEntity {
       waveformSamples: (json['waveform_samples'] as List?)
           ?.map((sample) => (sample as num).toDouble())
           .toList(),
+      blurHash: json['blur_hash'] as String?,
     );
   }
 
@@ -45,6 +47,7 @@ class MessageModel extends MessageEntity {
       'status': status.name,
       'created_at': createdAt.toIso8601String(),
       'waveform_samples': waveformSamples,
+      'blur_hash': blurHash,
     };
   }
 }

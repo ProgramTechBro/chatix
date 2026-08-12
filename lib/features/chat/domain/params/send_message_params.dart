@@ -9,6 +9,7 @@ class SendMessageParams {
     this.mediaUrl,
     this.mediaDurationMs,
     this.waveformSamples,
+    this.blurHash,
   });
 
   final String id;
@@ -18,4 +19,5 @@ class SendMessageParams {
   final String? mediaUrl;
   final int? mediaDurationMs;
   final List<double>? waveformSamples;
+  final String? blurHash;
 }
