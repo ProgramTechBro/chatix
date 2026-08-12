@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:dartz/dartz.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -146,6 +147,27 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     );
   }
 
+  void _onSendResult(String id, Either<Failure, void> result, String label) {
+    final notifier = ref.read(
+      optimisticMessagesProvider(widget.conversationId).notifier,
+    );
+    result.fold(
+      (failure) {
+        _logSendFailure(label, failure);
+        notifier.remove(id);
+      },
+      (_) {
+        Future.delayed(const Duration(seconds: 10), () {
+          if (!mounted) return;
+          final stillPending = ref
+              .read(optimisticMessagesProvider(widget.conversationId))
+              .any((message) => message.id == id);
+          if (stillPending) notifier.remove(id);
+        });
+      },
+    );
+  }
+
   Future<void> _sendText(String text) async {
     final id = _uuid.v4();
     final notifier = ref.read(
@@ -157,16 +179,12 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       text: text,
     );
     notifier.add(optimistic);
-    try {
-      final result = await getIt<SendMessageUseCase>().call(
-        id: id,
-        conversationId: widget.conversationId,
-        text: text,
-      );
-      result.fold((failure) => _logSendFailure('Send text', failure), (_) {});
-    } finally {
-      notifier.remove(id);
-    }
+    final result = await getIt<SendMessageUseCase>().call(
+      id: id,
+      conversationId: widget.conversationId,
+      text: text,
+    );
+    _onSendResult(id, result, 'Send text');
   }
 
   Future<void> _sendImage(File file) async {
@@ -181,16 +199,12 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       mediaUrl: file.path,
     );
     notifier.add(optimistic);
-    try {
-      final result = await getIt<SendImageMessageUseCase>().call(
-        id: id,
-        conversationId: widget.conversationId,
-        imageFile: file,
-      );
-      result.fold((failure) => _logSendFailure('Send image', failure), (_) {});
-    } finally {
-      notifier.remove(id);
-    }
+    final result = await getIt<SendImageMessageUseCase>().call(
+      id: id,
+      conversationId: widget.conversationId,
+      imageFile: file,
+    );
+    _onSendResult(id, result, 'Send image');
   }
 
   Future<void> _sendVoice(
@@ -211,18 +225,14 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       waveformSamples: waveformSamples,
     );
     notifier.add(optimistic);
-    try {
-      final result = await getIt<SendVoiceMessageUseCase>().call(
-        id: id,
-        conversationId: widget.conversationId,
-        audioFile: file,
-        durationMs: durationMs,
-        waveformSamples: waveformSamples,
-      );
-      result.fold((failure) => _logSendFailure('Send voice', failure), (_) {});
-    } finally {
-      notifier.remove(id);
-    }
+    final result = await getIt<SendVoiceMessageUseCase>().call(
+      id: id,
+      conversationId: widget.conversationId,
+      audioFile: file,
+      durationMs: durationMs,
+      waveformSamples: waveformSamples,
+    );
+    _onSendResult(id, result, 'Send voice');
   }
 
   @override
@@ -242,6 +252,19 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       final prevMessages = previous?.valueOrNull;
       final currMessages = next.valueOrNull;
       if (currMessages == null || currMessages.isEmpty) return;
+
+      final realIds = currMessages.map((message) => message.id).toSet();
+      final optimisticNotifier = ref.read(
+        optimisticMessagesProvider(widget.conversationId).notifier,
+      );
+      for (final pending in ref.read(
+        optimisticMessagesProvider(widget.conversationId),
+      )) {
+        if (realIds.contains(pending.id)) {
+          optimisticNotifier.remove(pending.id);
+        }
+      }
+
       if (prevMessages != null && prevMessages.length == currMessages.length) {
         return;
       }

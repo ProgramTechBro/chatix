@@ -117,7 +117,13 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen> {
                               AppRoutes.profilePath(chat.userId),
                             ),
                             onTap: () {
-                              ref.read(chatMessagesProvider(chat.id).future);
+                              ref
+                                  .read(chatMessagesProvider(chat.id).future)
+                                  .then(
+                                    (messages) => Future.wait(
+                                      prefetchImageBytes(messages),
+                                    ),
+                                  );
                               ref.read(chatHeaderProvider(chat.id).future);
                               context.push(AppRoutes.chatDetailPath(chat.id));
                             },

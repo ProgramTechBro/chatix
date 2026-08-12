@@ -100,7 +100,12 @@ class _MessageContent extends StatelessWidget {
             children: [
               isLocalFile
                   ? Image.file(File(mediaUrl), fit: BoxFit.cover)
-                  : CachedNetworkImage(imageUrl: mediaUrl, fit: BoxFit.cover),
+                  : CachedNetworkImage(
+                      imageUrl: mediaUrl,
+                      fit: BoxFit.cover,
+                      fadeInDuration: Duration.zero,
+                      fadeOutDuration: Duration.zero,
+                    ),
               if (message.isSending)
                 const Padding(
                   padding: EdgeInsets.all(12),

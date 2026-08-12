@@ -89,7 +89,7 @@ class PushNotificationService {
   Stream<String> get onTokenRefresh => _firebaseMessaging.onTokenRefresh;
 
   Future<void> clearNotification(String conversationId) {
-    return AwesomeNotifications().cancelNotificationsByGroupKey(conversationId);
+    return AwesomeNotifications().cancel(stableHash(conversationId));
   }
 
   static Future<void> handleMessage(
@@ -114,11 +114,15 @@ class PushNotificationService {
     final mediaUrl = data['mediaUrl'] as String?;
     final createdAt =
         DateTime.tryParse(data['createdAt'] as String? ?? '') ?? DateTime.now();
+    final rawMessageId = data['messageId'] as String?;
+    final messageId = (rawMessageId != null && rawMessageId.isNotEmpty)
+        ? rawMessageId
+        : 'fallback-${DateTime.now().microsecondsSinceEpoch}';
 
     await pendingStore.add(
       conversationId,
       PendingMessageModel(
-        messageId: data['messageId'] as String? ?? '',
+        messageId: messageId,
         senderName: senderName,
         senderAvatarUrl: senderAvatarUrl,
         preview: preview,
@@ -127,6 +131,7 @@ class PushNotificationService {
         mediaUrl: mediaUrl,
       ),
     );
+    await Future.delayed(const Duration(milliseconds: 300));
     final pending = await pendingStore.getAll(conversationId);
 
     await _buildNotification(
@@ -145,7 +150,9 @@ class PushNotificationService {
   }) {
     final id = stableHash(conversationId);
     developer.log(
-      'Building notification: conversationId=$conversationId id=$id pendingCount=${pending.length}',
+      'Building notification: conversationId=$conversationId id=$id '
+      'pendingCount=${pending.length} '
+      'messageIds=${pending.map((message) => message.messageId).toList()}',
       name: 'chatix',
     );
     final largeIcon = senderAvatarUrl.isNotEmpty ? senderAvatarUrl : null;
@@ -165,7 +172,6 @@ class PushNotificationService {
           bigPicture: singleImageUrl,
           largeIcon: largeIcon,
           notificationLayout: NotificationLayout.BigPicture,
-          groupKey: conversationId,
           payload: {'conversationId': conversationId},
         ),
       );
@@ -177,8 +183,6 @@ class PushNotificationService {
         channelKey: _chatChannelKey,
         title: senderName,
         body: pending.map((message) => message.preview).join('\n'),
-        summary: pending.length > 1 ? '${pending.length} new messages' : null,
-        groupKey: conversationId,
         largeIcon: largeIcon,
         notificationLayout: NotificationLayout.MessagingGroup,
         payload: {'conversationId': conversationId},
