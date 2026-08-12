@@ -14,20 +14,26 @@ class SendImageMessageUseCase {
   final ChatRepository _repository;
 
   Future<Either<Failure, void>> call({
+    required String id,
     required String conversationId,
     required File imageFile,
+    Future<String?>? blurHashFuture,
   }) async {
-    final uploadResult = await _repository.uploadChatMedia(
-      conversationId,
-      imageFile,
-    );
+    final results = await Future.wait([
+      _repository.uploadChatMedia(conversationId, imageFile),
+      blurHashFuture ?? Future.value(null),
+    ]);
+    final uploadResult = results[0] as Either<Failure, String>;
+    final blurHash = results[1] as String?;
     return uploadResult.fold(
       Left.new,
       (url) => _repository.sendMessage(
         SendMessageParams(
+          id: id,
           conversationId: conversationId,
           type: MessageType.image,
           mediaUrl: url,
+          blurHash: blurHash,
         ),
       ),
     );

@@ -1,3 +1,5 @@
+import 'dart:developer' as developer;
+
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -9,6 +11,8 @@ import '../../routes/app_pages.dart';
 import '../../routes/app_routes.dart';
 import '../constants/hive_boxes.dart';
 import '../di/injector.dart';
+import '../enums/message_type.dart';
+import '../utils/helpers/stable_hash.dart';
 import 'active_conversation_tracker.dart';
 
 const _chatChannelKey = 'chat_messages';
@@ -57,6 +61,11 @@ class PushNotificationService {
 
     await _firebaseMessaging.requestPermission();
 
+    final isAllowed = await AwesomeNotifications().isNotificationAllowed();
+    if (!isAllowed) {
+      await AwesomeNotifications().requestPermissionToSendNotifications();
+    }
+
     await AwesomeNotifications().setListeners(
       onActionReceivedMethod: onNotificationActionReceived,
     );
@@ -80,7 +89,7 @@ class PushNotificationService {
   Stream<String> get onTokenRefresh => _firebaseMessaging.onTokenRefresh;
 
   Future<void> clearNotification(String conversationId) {
-    return AwesomeNotifications().cancelNotificationsByGroupKey(conversationId);
+    return AwesomeNotifications().cancel(stableHash(conversationId));
   }
 
   static Future<void> handleMessage(
@@ -100,19 +109,29 @@ class PushNotificationService {
         data['preview'] as String? ??
         message.notification?.body ??
         'Sent you a message';
+    final type =
+        MessageType.values.asNameMap()[data['type']] ?? MessageType.text;
+    final mediaUrl = data['mediaUrl'] as String?;
     final createdAt =
         DateTime.tryParse(data['createdAt'] as String? ?? '') ?? DateTime.now();
+    final rawMessageId = data['messageId'] as String?;
+    final messageId = (rawMessageId != null && rawMessageId.isNotEmpty)
+        ? rawMessageId
+        : 'fallback-${DateTime.now().microsecondsSinceEpoch}';
 
     await pendingStore.add(
       conversationId,
       PendingMessageModel(
-        messageId: data['messageId'] as String? ?? '',
+        messageId: messageId,
         senderName: senderName,
         senderAvatarUrl: senderAvatarUrl,
         preview: preview,
         createdAt: createdAt,
+        type: type,
+        mediaUrl: mediaUrl,
       ),
     );
+    await Future.delayed(const Duration(milliseconds: 300));
     final pending = await pendingStore.getAll(conversationId);
 
     await _buildNotification(
@@ -129,15 +148,42 @@ class PushNotificationService {
     required String senderAvatarUrl,
     required List<PendingMessageModel> pending,
   }) {
+    final id = stableHash(conversationId);
+    developer.log(
+      'Building notification: conversationId=$conversationId id=$id '
+      'pendingCount=${pending.length} '
+      'messageIds=${pending.map((message) => message.messageId).toList()}',
+      name: 'chatix',
+    );
+    final largeIcon = senderAvatarUrl.isNotEmpty ? senderAvatarUrl : null;
+    final singleImage =
+        pending.length == 1 && pending.first.type == MessageType.image
+        ? pending.first
+        : null;
+    final singleImageUrl = singleImage?.mediaUrl;
+
+    if (singleImageUrl != null && singleImageUrl.isNotEmpty) {
+      return AwesomeNotifications().createNotification(
+        content: NotificationContent(
+          id: id,
+          channelKey: _chatChannelKey,
+          title: senderName,
+          body: 'Sent a photo',
+          bigPicture: singleImageUrl,
+          largeIcon: largeIcon,
+          notificationLayout: NotificationLayout.BigPicture,
+          payload: {'conversationId': conversationId},
+        ),
+      );
+    }
+
     return AwesomeNotifications().createNotification(
       content: NotificationContent(
-        id: conversationId.hashCode & 0x7fffffff,
+        id: id,
         channelKey: _chatChannelKey,
         title: senderName,
         body: pending.map((message) => message.preview).join('\n'),
-        summary: pending.length > 1 ? '${pending.length} new messages' : null,
-        groupKey: conversationId,
-        largeIcon: senderAvatarUrl.isNotEmpty ? senderAvatarUrl : null,
+        largeIcon: largeIcon,
         notificationLayout: NotificationLayout.MessagingGroup,
         payload: {'conversationId': conversationId},
       ),

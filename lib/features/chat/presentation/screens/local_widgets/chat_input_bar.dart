@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:audio_waveforms/audio_waveforms.dart'
+    show WaveformExtractionController;
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
@@ -9,6 +11,8 @@ import '../../../../../config/app_colors.dart';
 import '../../../../../core/di/injector.dart';
 import '../../../../../core/services/permission_service.dart';
 import '../../../../../core/utils/helpers/formatters.dart';
+
+const _waveformSampleCount = 30;
 
 class ChatInputBar extends StatefulWidget {
   const ChatInputBar({
@@ -21,7 +25,12 @@ class ChatInputBar extends StatefulWidget {
 
   final ValueChanged<String> onSend;
   final ValueChanged<File> onSendImage;
-  final void Function(File audioFile, int durationMs) onSendVoice;
+  final void Function(
+    File audioFile,
+    int durationMs,
+    List<double> waveformSamples,
+  )
+  onSendVoice;
   final VoidCallback? onTyping;
 
   @override
@@ -113,7 +122,11 @@ class _ChatInputBarState extends State<ChatInputBar> {
     final durationMs = _elapsed.inMilliseconds;
     _resetRecordingState();
     if (path != null && durationMs > 0) {
-      widget.onSendVoice(File(path), durationMs);
+      final samples = await WaveformExtractionController().extractWaveformData(
+        path: path,
+        noOfSamples: _waveformSampleCount,
+      );
+      widget.onSendVoice(File(path), durationMs, samples);
     }
   }
 

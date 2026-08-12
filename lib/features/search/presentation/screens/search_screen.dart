@@ -8,7 +8,9 @@ import '../../../../core/shared_widgets/app_error_view.dart';
 import '../../../../core/shared_widgets/app_loader.dart';
 import '../../../../core/utils/helpers/debouncer.dart';
 import '../../../../routes/app_routes.dart';
+import '../../../chat/presentation/providers/chat_provider.dart';
 import '../../../chat_list/domain/usecases/get_or_create_conversation_usecase.dart';
+import '../../../chat_list/presentation/providers/chat_list_provider.dart';
 import '../providers/search_provider.dart';
 import 'local_widgets/search_result_tile.dart';
 
@@ -39,8 +41,13 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       (failure) => ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text(failure.message))),
-      (conversationId) =>
-          context.push(AppRoutes.chatDetailPath(conversationId)),
+      (conversationId) {
+        ref
+            .read(chatMessagesProvider(conversationId).future)
+            .then((messages) => Future.wait(prefetchImageBytes(messages)));
+        ref.read(chatHeaderProvider(conversationId).future);
+        context.push(AppRoutes.chatDetailPath(conversationId));
+      },
     );
   }
 

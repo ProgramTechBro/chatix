@@ -87,19 +87,25 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
 
   @override
   Future<void> sendMessage({
+    required String id,
     required String conversationId,
     required String type,
     String? text,
     String? mediaUrl,
     int? mediaDurationMs,
+    List<double>? waveformSamples,
+    String? blurHash,
   }) async {
     await _client.from('messages').insert({
+      'id': id,
       'conversation_id': conversationId,
       'sender_id': _currentUserId,
       'type': type,
       'text': text,
       'media_url': mediaUrl,
       'media_duration_ms': mediaDurationMs,
+      'waveform_samples': waveformSamples,
+      'blur_hash': blurHash,
     });
   }
 

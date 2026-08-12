@@ -14,9 +14,11 @@ class SendVoiceMessageUseCase {
   final ChatRepository _repository;
 
   Future<Either<Failure, void>> call({
+    required String id,
     required String conversationId,
     required File audioFile,
     required int durationMs,
+    List<double>? waveformSamples,
   }) async {
     final uploadResult = await _repository.uploadChatMedia(
       conversationId,
@@ -26,10 +28,12 @@ class SendVoiceMessageUseCase {
       Left.new,
       (url) => _repository.sendMessage(
         SendMessageParams(
+          id: id,
           conversationId: conversationId,
           type: MessageType.voice,
           mediaUrl: url,
           mediaDurationMs: durationMs,
+          waveformSamples: waveformSamples,
         ),
       ),
     );

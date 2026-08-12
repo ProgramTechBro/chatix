@@ -12,11 +12,13 @@ class SendMessageUseCase {
   final ChatRepository _repository;
 
   Future<Either<Failure, void>> call({
+    required String id,
     required String conversationId,
     required String text,
   }) {
     return _repository.sendMessage(
       SendMessageParams(
+        id: id,
         conversationId: conversationId,
         type: MessageType.text,
         text: text,

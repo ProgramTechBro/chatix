@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_blurhash/flutter_blurhash.dart' show BlurHash;
 import 'package:intl/intl.dart';
 import '../../../../../config/app_colors.dart';
 import '../../../../../core/enums/message_type.dart';
@@ -89,11 +92,39 @@ class _MessageContent extends StatelessWidget {
   Widget build(BuildContext context) {
     switch (message.type) {
       case MessageType.image:
-        return ClipRRect(
-          borderRadius: BorderRadius.circular(16),
-          child: CachedNetworkImage(
-            imageUrl: message.mediaUrl!,
-            fit: BoxFit.cover,
+        final mediaUrl = message.mediaUrl!;
+        final isLocalFile = !mediaUrl.startsWith('http');
+        return AspectRatio(
+          aspectRatio: 4 / 3,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                isLocalFile
+                    ? Image.file(File(mediaUrl), fit: BoxFit.cover)
+                    : CachedNetworkImage(
+                        imageUrl: mediaUrl,
+                        fit: BoxFit.cover,
+                        fadeInDuration: const Duration(milliseconds: 200),
+                        fadeOutDuration: Duration.zero,
+                        placeholder: (context, url) => message.blurHash != null
+                            ? BlurHash(
+                                hash: message.blurHash!,
+                                color: AppColors.divider,
+                              )
+                            : Container(color: AppColors.divider),
+                      ),
+                if (message.isSending)
+                  const Padding(
+                    padding: EdgeInsets.all(12),
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: AppColors.white,
+                    ),
+                  ),
+              ],
+            ),
           ),
         );
       case MessageType.voice:
@@ -102,6 +133,7 @@ class _MessageContent extends StatelessWidget {
           totalDuration: Duration(milliseconds: message.mediaDurationMs ?? 0),
           color: textStyle?.color ?? AppColors.black,
           textStyle: textStyle,
+          waveformSamples: message.waveformSamples,
         );
       case MessageType.text:
         return Text(message.text ?? '', style: textStyle);

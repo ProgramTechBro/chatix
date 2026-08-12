@@ -7,11 +7,14 @@ abstract class ChatRemoteDataSource {
   Stream<List<MessageModel>> watchMessages(String conversationId);
 
   Future<void> sendMessage({
+    required String id,
     required String conversationId,
     required String type,
     String? text,
     String? mediaUrl,
     int? mediaDurationMs,
+    List<double>? waveformSamples,
+    String? blurHash,
   });
 
   Future<String> uploadChatMedia(String conversationId, File file);

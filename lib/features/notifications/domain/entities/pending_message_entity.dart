@@ -1,3 +1,5 @@
+import '../../../../core/enums/message_type.dart';
+
 class PendingMessageEntity {
   const PendingMessageEntity({
     required this.messageId,
@@ -5,6 +7,8 @@ class PendingMessageEntity {
     required this.senderAvatarUrl,
     required this.preview,
     required this.createdAt,
+    required this.type,
+    this.mediaUrl,
   });
 
   final String messageId;
@@ -12,4 +16,6 @@ class PendingMessageEntity {
   final String senderAvatarUrl;
   final String preview;
   final DateTime createdAt;
+  final MessageType type;
+  final String? mediaUrl;
 }
