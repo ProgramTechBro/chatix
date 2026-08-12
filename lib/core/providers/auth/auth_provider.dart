@@ -38,7 +38,7 @@ class SessionController extends _$SessionController {
       if (user != null) {
         _startPresenceHeartbeat();
         _registerDeviceToken(user.id);
-        ref.read(chatListReadyProvider);
+        ref.read(chatListWarmupProvider);
       }
     });
   }

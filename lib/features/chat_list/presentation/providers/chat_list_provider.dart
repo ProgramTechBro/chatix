@@ -19,9 +19,21 @@ Stream<List<ChatSummaryEntity>> chatList(ChatListRef ref) {
   return getIt<WatchChatListUseCase>().call();
 }
 
+/// Resolves as soon as the chat list itself is available (cache-first, so this
+/// is near-instant on every app reopen). The chat list screen gates its
+/// skeleton on this alone — it never waits on header/image warmup.
 @Riverpod(keepAlive: true)
 Future<List<ChatSummaryEntity>> chatListReady(ChatListReadyRef ref) async {
-  final chats = await ref.read(chatListProvider.future);
+  return ref.read(chatListProvider.future);
+}
+
+/// Warms up the header and image cache for the most recent conversations in
+/// the background, plus keeps listening for newly-arriving images in those
+/// conversations for the rest of the session. Triggered fire-and-forget at
+/// login/session-restore; never blocks the chat list screen's own render.
+@Riverpod(keepAlive: true)
+Future<void> chatListWarmup(ChatListWarmupRef ref) async {
+  final chats = await ref.read(chatListReadyProvider.future);
   final recent = chats.take(_recentConversationsPrefetchLimit).toList();
 
   final messageLists = await Future.wait([
@@ -36,11 +48,9 @@ Future<List<ChatSummaryEntity>> chatListReady(ChatListReadyRef ref) async {
   for (final chat in recent) {
     _watchForNewImages(ref, chat.id);
   }
-
-  return chats;
 }
 
-void _watchForNewImages(ChatListReadyRef ref, String conversationId) {
+void _watchForNewImages(ChatListWarmupRef ref, String conversationId) {
   ref.listen(chatMessagesProvider(conversationId), (previous, next) {
     next.whenData((messages) {
       final previousIds =

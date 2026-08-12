@@ -46,6 +46,10 @@ import 'package:chatix/features/auth/domain/usecases/update_last_seen_usecase.da
     as _i30;
 import 'package:chatix/features/auth/domain/usecases/verify_phone_number_usecase.dart'
     as _i906;
+import 'package:chatix/features/chat/data/datasources/local/chat_header_local_datasource.dart'
+    as _i1032;
+import 'package:chatix/features/chat/data/datasources/local/chat_header_local_datasource_impl.dart'
+    as _i537;
 import 'package:chatix/features/chat/data/datasources/local/chat_local_datasource.dart'
     as _i430;
 import 'package:chatix/features/chat/data/datasources/local/chat_local_datasource_impl.dart'
@@ -276,6 +280,9 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i974.ConnectionsLocalDataSource>(
       () => _i974.ConnectionsLocalDataSourceImpl(),
     );
+    gh.lazySingleton<_i1032.ChatHeaderLocalDataSource>(
+      () => _i537.ChatHeaderLocalDataSourceImpl(),
+    );
     gh.lazySingleton<_i958.CommentsLocalDataSource>(
       () => _i958.CommentsLocalDataSourceImpl(),
     );
@@ -358,6 +365,31 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i2.ShareContactsLocalDataSource>(),
       ),
     );
+    gh.lazySingleton<_i930.ChatRepository>(
+      () => _i1056.ChatRepositoryImpl(
+        gh<_i654.ChatRemoteDataSource>(),
+        gh<_i430.ChatLocalDataSource>(),
+        gh<_i1032.ChatHeaderLocalDataSource>(),
+      ),
+    );
+    gh.factory<_i166.MarkConversationReadUseCase>(
+      () => _i166.MarkConversationReadUseCase(gh<_i930.ChatRepository>()),
+    );
+    gh.factory<_i785.SendImageMessageUseCase>(
+      () => _i785.SendImageMessageUseCase(gh<_i930.ChatRepository>()),
+    );
+    gh.factory<_i994.SendMessageUseCase>(
+      () => _i994.SendMessageUseCase(gh<_i930.ChatRepository>()),
+    );
+    gh.factory<_i229.SendVoiceMessageUseCase>(
+      () => _i229.SendVoiceMessageUseCase(gh<_i930.ChatRepository>()),
+    );
+    gh.factory<_i504.WatchConversationHeaderUseCase>(
+      () => _i504.WatchConversationHeaderUseCase(gh<_i930.ChatRepository>()),
+    );
+    gh.factory<_i642.WatchMessagesUseCase>(
+      () => _i642.WatchMessagesUseCase(gh<_i930.ChatRepository>()),
+    );
     gh.factory<_i69.SendTypingIndicatorUseCase>(
       () => _i69.SendTypingIndicatorUseCase(gh<_i529.TypingRepository>()),
     );
@@ -384,12 +416,6 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factory<_i6.GetPendingMessagesUseCase>(
       () => _i6.GetPendingMessagesUseCase(gh<_i79.PendingMessagesRepository>()),
-    );
-    gh.lazySingleton<_i930.ChatRepository>(
-      () => _i1056.ChatRepositoryImpl(
-        gh<_i654.ChatRemoteDataSource>(),
-        gh<_i430.ChatLocalDataSource>(),
-      ),
     );
     gh.factory<_i999.GetShareContactsUseCase>(
       () => _i999.GetShareContactsUseCase(gh<_i376.ShareContactsRepository>()),
@@ -451,24 +477,6 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factory<_i566.GetOrExtractVoiceWaveformUseCase>(
       () => _i566.GetOrExtractVoiceWaveformUseCase(gh<_i847.VoiceRepository>()),
-    );
-    gh.factory<_i166.MarkConversationReadUseCase>(
-      () => _i166.MarkConversationReadUseCase(gh<_i930.ChatRepository>()),
-    );
-    gh.factory<_i785.SendImageMessageUseCase>(
-      () => _i785.SendImageMessageUseCase(gh<_i930.ChatRepository>()),
-    );
-    gh.factory<_i994.SendMessageUseCase>(
-      () => _i994.SendMessageUseCase(gh<_i930.ChatRepository>()),
-    );
-    gh.factory<_i229.SendVoiceMessageUseCase>(
-      () => _i229.SendVoiceMessageUseCase(gh<_i930.ChatRepository>()),
-    );
-    gh.factory<_i504.WatchConversationHeaderUseCase>(
-      () => _i504.WatchConversationHeaderUseCase(gh<_i930.ChatRepository>()),
-    );
-    gh.factory<_i642.WatchMessagesUseCase>(
-      () => _i642.WatchMessagesUseCase(gh<_i930.ChatRepository>()),
     );
     gh.factory<_i295.ConfirmPhoneOtpUseCase>(
       () => _i295.ConfirmPhoneOtpUseCase(gh<_i31.AuthRepository>()),

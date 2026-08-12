@@ -8,15 +8,21 @@ import '../../domain/entities/chat_header_entity.dart';
 import '../../domain/entities/message_entity.dart';
 import '../../domain/params/send_message_params.dart';
 import '../../domain/repositories/chat_repository.dart';
+import '../datasources/local/chat_header_local_datasource.dart';
 import '../datasources/local/chat_local_datasource.dart';
 import '../datasources/remote/chat_remote_datasource.dart';
 
 @LazySingleton(as: ChatRepository)
 class ChatRepositoryImpl implements ChatRepository {
-  const ChatRepositoryImpl(this._remoteDataSource, this._localDataSource);
+  const ChatRepositoryImpl(
+    this._remoteDataSource,
+    this._localDataSource,
+    this._headerLocalDataSource,
+  );
 
   final ChatRemoteDataSource _remoteDataSource;
   final ChatLocalDataSource _localDataSource;
+  final ChatHeaderLocalDataSource _headerLocalDataSource;
 
   @override
   Stream<List<MessageEntity>> watchMessages(String conversationId) async* {
@@ -62,8 +68,18 @@ class ChatRepositoryImpl implements ChatRepository {
   }
 
   @override
-  Stream<ChatHeaderEntity> watchConversationHeader(String conversationId) {
-    return _remoteDataSource.watchConversationHeader(conversationId);
+  Stream<ChatHeaderEntity> watchConversationHeader(
+    String conversationId,
+  ) async* {
+    final cached = _headerLocalDataSource.getCached(conversationId);
+    if (cached != null) yield cached;
+
+    yield* _remoteDataSource.watchConversationHeader(conversationId).map((
+      header,
+    ) {
+      unawaited(_headerLocalDataSource.saveCache(conversationId, header));
+      return header;
+    });
   }
 
   @override
